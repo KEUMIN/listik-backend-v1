@@ -1,4 +1,4 @@
-package com.listik.authservice.oauth
+package com.listik.authservice.oauth2
 
 import com.listik.coreservice.dto.UserProfile
 import org.springframework.security.oauth2.core.user.OAuth2User

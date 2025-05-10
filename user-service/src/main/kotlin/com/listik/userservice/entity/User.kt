@@ -14,3 +14,14 @@ class User(
     var passwordHash: String? = null,
     var refreshToken: String? = null
 )
+{
+    protected constructor() : this(
+        id      = 0,
+        email   = "",
+        name    = "",
+        provider    = null,
+        providerId  = null,
+        passwordHash = null,
+        refreshToken = null
+    )
+}
