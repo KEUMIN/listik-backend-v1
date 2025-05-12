@@ -34,4 +34,10 @@ class AuthController(
         return ResponseEntity.ok(TokenResponse(token))
     }
 
+    @PostMapping("/oauth2/apple")
+    fun oauth2Apple(@RequestBody request: IdTokenRequest): ResponseEntity<TokenResponse> {
+        val token = authService.authenticateApple(request.idToken)
+        return ResponseEntity.ok(TokenResponse(token))
+    }
+
 }

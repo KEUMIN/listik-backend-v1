@@ -6,4 +6,4 @@ pluginManagement {
 }
 
 rootProject.name = "oauth"
-include("api-service", "auth-service", "user-service", "core-service")
+include("api-service", "auth-service", "user-service", "core-service", "book-service", "review-service")

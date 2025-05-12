@@ -15,6 +15,8 @@ dependencies {
     // 3) JSON 파싱용 GsonFactory
     implementation("com.google.http-client:google-http-client-gson:1.47.0")
 
+    implementation("com.nimbusds:nimbus-jose-jwt:9.31")
+
     // jwt
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
