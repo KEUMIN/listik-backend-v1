@@ -75,30 +75,22 @@ class AuthService(
     }
 
     fun authenticateApple(idTokenString: String): String {
-        // 1. Apple 공개키 JWKSet 직접 가져오기
         val jwkSet = JWKSet.load(URL("https://appleid.apple.com/auth/keys"))
         val jwkSource: JWKSource<SecurityContext> = ImmutableJWKSet(jwkSet)
 
-        // 2. JWT Processor 구성
         val jwtProcessor: ConfigurableJWTProcessor<SecurityContext> = DefaultJWTProcessor()
         val keySelector = JWSVerificationKeySelector(JWSAlgorithm.RS256, jwkSource)
-        jwtProcessor.setJWSKeySelector(keySelector)
+        jwtProcessor.jwsKeySelector = keySelector
 
-        // 3. JWT 토큰 파싱 & 검증
         val claims: JWTClaimsSet = jwtProcessor.process(idTokenString, null)
 
-        // 4. 클레임 검증
-        if (claims.issuer != "https://appleid.apple.com") {
-            throw IllegalArgumentException("Invalid issuer: ${claims.issuer}")
-        }
-        if (!claims.audience.contains(appleClientId)) {
-            throw IllegalArgumentException("Invalid audience: ${claims.audience}")
-        }
+        // 🔐 보안 필수 검증
+        require(claims.issuer == "https://appleid.apple.com") { "Invalid issuer: ${claims.issuer}" }
+        require(claims.audience.contains(appleClientId)) { "Invalid audience: ${claims.audience}" }
 
-        val email = claims.getStringClaim("email") ?: throw IllegalArgumentException("No email in token")
-        val providerId = claims.subject
+        val providerId = claims.subject  // Apple 고유 사용자 ID (변하지 않음)
+        val email = claims.getStringClaim("email") ?: "user-$providerId@apple.local" // 첫 로그인 외 null 가능
 
-        // 5. 사용자 처리
         val user = userService.findByEmail(email)?.apply {
             if (this.provider.isNullOrBlank() || this.providerId.isNullOrBlank()) {
                 this.provider = "apple"
@@ -106,10 +98,10 @@ class AuthService(
                 userService.save(this)
             }
         } ?: userService.save(
-            User(email = email, name = email.substringBefore("@"), provider = "apple", providerId = providerId)
+            User(email = email, name = "", provider = "apple", providerId = providerId)
         )
 
-        // 6. JWT 생성
         return jwtTokenProvider.createToken(user.email)
     }
+
 }
