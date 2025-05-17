@@ -1,3 +1,3 @@
-package com.listik.apiservice.dto
+package com.listik.apiservice.auth.dto.request
 
 data class SigninRequest(val email: String, val password: String)

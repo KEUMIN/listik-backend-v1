@@ -5,8 +5,10 @@ import com.listik.bookservice.domain.port.input.BookRecordUseCase
 import com.listik.bookservice.domain.port.input.CreateBookCommand
 import com.listik.bookservice.domain.port.input.UpdateBookCommand
 import com.listik.bookservice.domain.port.output.BookRecordRepositoryPort
+import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+@Service
 class BookRecordService(
     private val repository: BookRecordRepositoryPort
 ) : BookRecordUseCase {

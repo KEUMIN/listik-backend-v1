@@ -1,4 +1,4 @@
-package com.listik.apiservice.dto
+package com.listik.apiservice.auth.dto.request
 
 data class IdTokenRequest(val idToken: String)
 

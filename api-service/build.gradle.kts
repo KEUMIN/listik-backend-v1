@@ -4,6 +4,7 @@ dependencies {
     implementation(project(":auth-service"))
     implementation(project(":user-service"))
     implementation(project(":core-service"))
+    implementation(project(":book-service"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
