@@ -26,7 +26,14 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**", "/error", "/favicon.ico").permitAll()
+                it.requestMatchers(
+                    "/swagger-ui/**",        // Swagger UI
+                    "/v3/api-docs/**",       // OpenAPI spec
+                    "/swagger-resources/**", // 구버전 호환
+                    "/webjars/**",            // 정적 리소스
+                    "/api/auth/**",
+                    "/error",
+                    "/favicon.ico").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter::class.java)
