@@ -4,6 +4,8 @@ import com.listik.apiservice.book.dto.request.CreateBookRequest
 import com.listik.apiservice.book.dto.request.UpdateBookRequest
 import com.listik.apiservice.book.dto.response.BookResponse
 import com.listik.apiservice.common.dto.ApiResponse
+import com.listik.apiservice.common.dto.SliceResponse
+import com.listik.bookservice.domain.model.BookRecord
 import com.listik.bookservice.domain.port.input.BookRecordUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -50,18 +52,22 @@ class BookRecordController(
         return ResponseEntity
             .ok(ApiResponse.success(BookResponse.from(book)))
     }
-    @Operation(summary = "사용자의 책 목록 조회", description = "특정 유저의 책 목록을 페이징 조회합니다.")
-    @GetMapping("/user/{userId}")
-    fun getAllByUser(
+    @Operation(summary = "상태별 책 목록 조회 (스크롤 페이징)", description = "유저 ID와 상태에 따라 책 목록을 페이징 조회합니다.")
+    @GetMapping("/user/{userId}/status")
+    fun getAllByUserAndStatus(
         @PathVariable userId: Long,
+        @RequestParam status: BookRecord.Status,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): ResponseEntity<ApiResponse<List<BookResponse>>> {
-        val list = service.getAllByUser(userId, page, size)
-            .map(BookResponse::from)
-        return ResponseEntity
-            .ok(ApiResponse.success(list))
+    ): ResponseEntity<ApiResponse<SliceResponse<BookResponse>>> {
+        val slice = service.getAllByUserAndStatus(userId, status, page, size)
+        val dtoSlice = SliceResponse(
+            content = slice.content.map(BookResponse::from),
+            hasNext = slice.hasNext()
+        )
+        return ResponseEntity.ok(ApiResponse.success(dtoSlice))
     }
+
     @Operation(summary = "책 검색", description = "제목/작가 키워드로 검색")
     @GetMapping("/search")
     fun search(

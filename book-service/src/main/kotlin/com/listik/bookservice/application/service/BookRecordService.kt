@@ -5,6 +5,7 @@ import com.listik.bookservice.domain.port.input.BookRecordUseCase
 import com.listik.bookservice.domain.port.input.CreateBookCommand
 import com.listik.bookservice.domain.port.input.UpdateBookCommand
 import com.listik.bookservice.domain.port.output.BookRecordRepositoryPort
+import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -13,8 +14,9 @@ class BookRecordService(
     private val repository: BookRecordRepositoryPort
 ) : BookRecordUseCase {
 
-    override fun getAllByUser(userId: Long, page: Int, size: Int): List<BookRecord> =
-        repository.findAllByUserId(userId, page, size)
+    override fun getAllByUserAndStatus(userId: Long, status: BookRecord.Status, page: Int, size: Int): Slice<BookRecord> {
+        return repository.findAllByUserIdAndStatus(userId, status, page, size)
+    }
 
     override fun getOne(id: Long): BookRecord =
         repository.findById(id) ?: throw IllegalArgumentException("Book not found")

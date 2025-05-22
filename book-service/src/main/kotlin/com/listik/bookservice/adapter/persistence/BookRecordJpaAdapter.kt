@@ -4,6 +4,7 @@ import com.listik.bookservice.adapter.persistence.entity.BookRecordEntity
 import com.listik.bookservice.domain.model.BookRecord
 import com.listik.bookservice.domain.port.output.BookRecordRepositoryPort
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -11,8 +12,11 @@ class BookRecordJpaAdapter(
     private val jpaRepository: BookRecordRepository
 ) : BookRecordRepositoryPort {
 
-    override fun findAllByUserId(userId: Long, page: Int, size: Int): List<BookRecord> =
-        jpaRepository.findAllByUserId(userId, PageRequest.of(page, size)).map { it.toDomain() }
+    override fun findAllByUserIdAndStatus(userId: Long, status: BookRecord.Status, page: Int, size: Int): Slice<BookRecord> {
+        val pageable = PageRequest.of(page, size)
+        return jpaRepository.findAllByUserIdAndStatus(userId, status, pageable)
+            .map { it.toDomain() }
+    }
 
     override fun findById(id: Long): BookRecord? =
         jpaRepository.findById(id).orElse(null)?.toDomain()
