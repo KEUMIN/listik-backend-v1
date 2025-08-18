@@ -1,13 +1,11 @@
-package com.listik.authservice.service
+package com.listik.userservice.service
 
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
-import com.listik.authservice.jwt.JwtTokenProvider
-import com.listik.userservice.entity.UserEntity
-import com.listik.userservice.service.UserService
+import com.listik.userservice.jwt.JwtTokenProvider
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
@@ -33,15 +31,22 @@ class AuthService(
     private val appleClientId: String
 ) {
     fun signUp(email: String, password: String, name: String): String {
-        if (userService.findByEmail(email) != null) throw IllegalStateException("Email already in use")
-        val userEntity = UserEntity(email = email, nickname = name, passwordHash = passwordEncoder.encode(password), provider = null, providerId = null)
-        userService.save(userEntity)
+        if (userService.findAuthAccountByEmail(email) != null) throw IllegalStateException("Email already in use")
+        val (user, authAccount) = userService.createUserWithAuthAccount(
+            nickname = name,
+            email = email,
+            passwordHash = passwordEncoder.encode(password),
+            provider = null,
+            providerUserId = null
+        )
         return jwtTokenProvider.createToken(email)
     }
 
     fun signIn(email: String, password: String): String {
-        val user = userService.findByEmail(email) ?: throw IllegalArgumentException("User not found")
-        if (!passwordEncoder.matches(password, user.passwordHash)) throw IllegalArgumentException("Invalid credentials")
+        val authAccount = userService.findAuthAccountByEmail(email) ?: throw IllegalArgumentException("User not found")
+        if (authAccount.passwordHash == null || !passwordEncoder.matches(password, authAccount.passwordHash!!)) {
+            throw IllegalArgumentException("Invalid credentials")
+        }
         return jwtTokenProvider.createToken(email)
     }
 
@@ -61,17 +66,30 @@ class AuthService(
         val name = payload["name"] as? String ?: "GoogleUser"
         val providerId = payload.subject // Google 고유 ID
 
-        val userEntity = userService.findByEmail(email)?.apply {
-            if (this.provider.isNullOrBlank() || this.providerId.isNullOrBlank()) {
-                this.provider = "google"
-                this.providerId = providerId
-                userService.save(this)
+        val existingAuthAccount = userService.findAuthAccountByProvider("GOOGLE", providerId)
+        if (existingAuthAccount != null) {
+            return jwtTokenProvider.createToken(existingAuthAccount.email!!)
+        }
+
+        val emailAuthAccount = userService.findAuthAccountByEmail(email)
+        if (emailAuthAccount != null) {
+            if (emailAuthAccount.provider == null) {
+                emailAuthAccount.provider = "GOOGLE"
+                emailAuthAccount.providerUserId = providerId
+                userService.saveAuthAccount(emailAuthAccount)
             }
-        } ?: userService.save(
-            UserEntity(email = email, nickname = name, provider = "google", providerId = providerId)
+            return jwtTokenProvider.createToken(email)
+        }
+
+        val (user, authAccount) = userService.createUserWithAuthAccount(
+            nickname = name,
+            email = email,
+            passwordHash = null,
+            provider = "GOOGLE",
+            providerUserId = providerId
         )
 
-        return jwtTokenProvider.createToken(userEntity.email)
+        return jwtTokenProvider.createToken(authAccount.email!!)
     }
 
     fun authenticateApple(idTokenString: String): String {
@@ -91,17 +109,30 @@ class AuthService(
         val providerId = claims.subject  // Apple 고유 사용자 ID (변하지 않음)
         val email = claims.getStringClaim("email") ?: "user-$providerId@apple.local" // 첫 로그인 외 null 가능
 
-        val userEntity = userService.findByEmail(email)?.apply {
-            if (this.provider.isNullOrBlank() || this.providerId.isNullOrBlank()) {
-                this.provider = "apple"
-                this.providerId = providerId
-                userService.save(this)
+        val existingAuthAccount = userService.findAuthAccountByProvider("APPLE", providerId)
+        if (existingAuthAccount != null) {
+            return jwtTokenProvider.createToken(existingAuthAccount.email!!)
+        }
+
+        val emailAuthAccount = userService.findAuthAccountByEmail(email)
+        if (emailAuthAccount != null) {
+            if (emailAuthAccount.provider == null) {
+                emailAuthAccount.provider = "APPLE"
+                emailAuthAccount.providerUserId = providerId
+                userService.saveAuthAccount(emailAuthAccount)
             }
-        } ?: userService.save(
-            UserEntity(email = email, nickname = "", provider = "apple", providerId = providerId)
+            return jwtTokenProvider.createToken(email)
+        }
+
+        val (user, authAccount) = userService.createUserWithAuthAccount(
+            nickname = "",
+            email = email,
+            passwordHash = null,
+            provider = "APPLE",
+            providerUserId = providerId
         )
 
-        return jwtTokenProvider.createToken(userEntity.email)
+        return jwtTokenProvider.createToken(authAccount.email!!)
     }
 
 }

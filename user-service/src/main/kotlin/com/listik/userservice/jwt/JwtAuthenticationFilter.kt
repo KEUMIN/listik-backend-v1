@@ -1,4 +1,4 @@
-package com.listik.authservice.jwt
+package com.listik.userservice.jwt
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest

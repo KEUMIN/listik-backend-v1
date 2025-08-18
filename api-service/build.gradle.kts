@@ -1,7 +1,6 @@
 tasks.register("prepareKotlinBuildScriptModel")
 
 dependencies {
-    implementation(project(":auth-service"))
     implementation(project(":user-service"))
     implementation(project(":core-service"))
     implementation(project(":book-service"))

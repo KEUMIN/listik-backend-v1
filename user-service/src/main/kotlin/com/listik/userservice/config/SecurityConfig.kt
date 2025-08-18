@@ -1,7 +1,7 @@
-package com.listik.authservice.config
+package com.listik.userservice.config
 
-import com.listik.authservice.jwt.JwtAuthenticationFilter
-import com.listik.authservice.jwt.JwtTokenProvider
+import com.listik.userservice.jwt.JwtAuthenticationFilter
+import com.listik.userservice.jwt.JwtTokenProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

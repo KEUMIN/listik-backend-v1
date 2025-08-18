@@ -5,7 +5,7 @@ import com.listik.apiservice.auth.dto.request.SigninRequest
 import com.listik.apiservice.auth.dto.request.SignupRequest
 import com.listik.apiservice.auth.dto.response.TokenResponse
 import com.listik.apiservice.common.dto.ApiResponse
-import com.listik.authservice.service.AuthService
+import com.listik.userservice.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
