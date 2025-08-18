@@ -6,7 +6,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.listik.authservice.jwt.JwtTokenProvider
-import com.listik.userservice.entity.User
+import com.listik.userservice.entity.UserEntity
 import com.listik.userservice.service.UserService
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.JWKSet
@@ -34,8 +34,8 @@ class AuthService(
 ) {
     fun signUp(email: String, password: String, name: String): String {
         if (userService.findByEmail(email) != null) throw IllegalStateException("Email already in use")
-        val user = User(email = email, name = name, passwordHash = passwordEncoder.encode(password), provider = null, providerId = null)
-        userService.save(user)
+        val userEntity = UserEntity(email = email, nickname = name, passwordHash = passwordEncoder.encode(password), provider = null, providerId = null)
+        userService.save(userEntity)
         return jwtTokenProvider.createToken(email)
     }
 
@@ -61,17 +61,17 @@ class AuthService(
         val name = payload["name"] as? String ?: "GoogleUser"
         val providerId = payload.subject // Google 고유 ID
 
-        val user = userService.findByEmail(email)?.apply {
+        val userEntity = userService.findByEmail(email)?.apply {
             if (this.provider.isNullOrBlank() || this.providerId.isNullOrBlank()) {
                 this.provider = "google"
                 this.providerId = providerId
                 userService.save(this)
             }
         } ?: userService.save(
-            User(email = email, name = name, provider = "google", providerId = providerId)
+            UserEntity(email = email, nickname = name, provider = "google", providerId = providerId)
         )
 
-        return jwtTokenProvider.createToken(user.email)
+        return jwtTokenProvider.createToken(userEntity.email)
     }
 
     fun authenticateApple(idTokenString: String): String {
@@ -91,17 +91,17 @@ class AuthService(
         val providerId = claims.subject  // Apple 고유 사용자 ID (변하지 않음)
         val email = claims.getStringClaim("email") ?: "user-$providerId@apple.local" // 첫 로그인 외 null 가능
 
-        val user = userService.findByEmail(email)?.apply {
+        val userEntity = userService.findByEmail(email)?.apply {
             if (this.provider.isNullOrBlank() || this.providerId.isNullOrBlank()) {
                 this.provider = "apple"
                 this.providerId = providerId
                 userService.save(this)
             }
         } ?: userService.save(
-            User(email = email, name = "", provider = "apple", providerId = providerId)
+            UserEntity(email = email, nickname = "", provider = "apple", providerId = providerId)
         )
 
-        return jwtTokenProvider.createToken(user.email)
+        return jwtTokenProvider.createToken(userEntity.email)
     }
 
 }

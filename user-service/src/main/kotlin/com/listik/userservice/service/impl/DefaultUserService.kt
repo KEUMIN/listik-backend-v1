@@ -1,6 +1,6 @@
 package com.listik.userservice.service.impl
 
-import com.listik.userservice.entity.User
+import com.listik.userservice.entity.UserEntity
 import com.listik.userservice.repository.UserRepository
 import com.listik.userservice.service.UserService
 import org.springframework.stereotype.Service
@@ -9,15 +9,15 @@ import org.springframework.stereotype.Service
 class DefaultUserService (
     private val userRepository: UserRepository
 ): UserService {
-    override fun findByEmail(email: String): User? {
+    override fun findByEmail(email: String): UserEntity? {
         return userRepository.findByEmail(email)
     }
 
-    override fun findByRefreshToken(refreshToken: String): User? {
+    override fun findByRefreshToken(refreshToken: String): UserEntity? {
         return userRepository.findByRefreshToken(refreshToken)
     }
 
-    override fun save(user: User): User {
-        return userRepository.save(user)
+    override fun save(userEntity: UserEntity): UserEntity {
+        return userRepository.save(userEntity)
     }
 }
