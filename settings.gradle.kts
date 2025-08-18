@@ -5,5 +5,12 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+    }
+}
+
 rootProject.name = "listik-backend"
-include("api-service", "user-service", "core-service", "book-service")
+include("gateway-service", "user-service", "core-service", "book-service")
