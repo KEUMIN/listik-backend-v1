@@ -17,10 +17,6 @@ class DefaultUserService (
         return authAccountRepository.findByEmail(email)?.user
     }
 
-    override fun findByRefreshToken(refreshToken: String): UserEntity? {
-        return userRepository.findByRefreshToken(refreshToken)
-    }
-
     override fun save(userEntity: UserEntity): UserEntity {
         return userRepository.save(userEntity)
     }

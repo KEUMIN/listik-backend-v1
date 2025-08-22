@@ -1,4 +1,4 @@
-package com.listik.userservice.jwt
+package com.listik.authservice.jwt
 
 import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys

@@ -39,5 +39,13 @@ out/
 ### Kotlin ###
 .kotlin
 
+### Environment Variables ###
+.env
+.env.local
+.env.*.local
+
 ### settings ###
 application.yml
+
+### SQL Files ###
+*.sql

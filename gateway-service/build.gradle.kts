@@ -29,6 +29,7 @@ dependencies {
     // Minimal Spring Cloud Gateway dependencies
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -37,6 +38,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom(SpringBootPlugin.BOM_COORDINATES)
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.1.3")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
     }
 }

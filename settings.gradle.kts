@@ -13,4 +13,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "listik-backend"
-include("gateway-service", "user-service", "core-service", "book-service")
+include("gateway-service", "user-service", "auth-service", "core-service", "book-service")

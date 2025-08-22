@@ -1,11 +1,13 @@
-package com.listik.userservice.service
-
+package com.listik.authservice.service
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
-import com.listik.userservice.jwt.JwtTokenProvider
+import com.listik.authservice.client.AuthAccountDto
+import com.listik.authservice.client.CreateUserWithAuthRequest
+import com.listik.authservice.client.UserServiceClient
+import com.listik.authservice.jwt.JwtTokenProvider
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
@@ -22,7 +24,7 @@ import java.net.URL
 
 @Service
 class AuthService(
-    private val userService: UserService,
+    private val userServiceClient: UserServiceClient,
     private val jwtTokenProvider: JwtTokenProvider,
     private val passwordEncoder: PasswordEncoder,
     @Value("\${spring.security.oauth2.client.registration.google.client-id}")
@@ -30,23 +32,33 @@ class AuthService(
     @Value("\${spring.security.oauth2.client.registration.apple.client-id}")
     private val appleClientId: String
 ) {
+    
     fun signUp(email: String, password: String, name: String): String {
-        if (userService.findAuthAccountByEmail(email) != null) throw IllegalStateException("Email already in use")
-        val (user, authAccount) = userService.createUserWithAuthAccount(
+        val existingAccount = userServiceClient.findAuthAccountByEmail(email).data
+        if (existingAccount != null) {
+            throw IllegalStateException("Email already in use")
+        }
+        
+        val request = CreateUserWithAuthRequest(
             nickname = name,
             email = email,
             passwordHash = passwordEncoder.encode(password),
             provider = null,
             providerUserId = null
         )
+        
+        userServiceClient.createUserWithAuthAccount(request)
         return jwtTokenProvider.createToken(email)
     }
 
     fun signIn(email: String, password: String): String {
-        val authAccount = userService.findAuthAccountByEmail(email) ?: throw IllegalArgumentException("User not found")
-        if (authAccount.passwordHash == null || !passwordEncoder.matches(password, authAccount.passwordHash!!)) {
+        val authAccount = userServiceClient.findAuthAccountByEmail(email).data
+            ?: throw IllegalArgumentException("User not found")
+        
+        if (authAccount.passwordHash == null || !passwordEncoder.matches(password, authAccount.passwordHash)) {
             throw IllegalArgumentException("Invalid credentials")
         }
+        
         return jwtTokenProvider.createToken(email)
     }
 
@@ -64,24 +76,26 @@ class AuthService(
         val payload = idToken.payload
         val email = payload.email
         val name = payload["name"] as? String ?: "GoogleUser"
-        val providerId = payload.subject // Google 고유 ID
+        val providerId = payload.subject
 
-        val existingAuthAccount = userService.findAuthAccountByProvider("GOOGLE", providerId)
+        val existingAuthAccount = userServiceClient.findAuthAccountByProvider("GOOGLE", providerId).data
         if (existingAuthAccount != null) {
             return jwtTokenProvider.createToken(existingAuthAccount.email!!)
         }
 
-        val emailAuthAccount = userService.findAuthAccountByEmail(email)
+        val emailAuthAccount = userServiceClient.findAuthAccountByEmail(email).data
         if (emailAuthAccount != null) {
             if (emailAuthAccount.provider == null) {
-                emailAuthAccount.provider = "GOOGLE"
-                emailAuthAccount.providerUserId = providerId
-                userService.saveAuthAccount(emailAuthAccount)
+                val updatedAccount = emailAuthAccount.copy(
+                    provider = "GOOGLE",
+                    providerUserId = providerId
+                )
+                userServiceClient.updateAuthAccount(emailAuthAccount.id!!, updatedAccount)
             }
             return jwtTokenProvider.createToken(email)
         }
 
-        val (user, authAccount) = userService.createUserWithAuthAccount(
+        val request = CreateUserWithAuthRequest(
             nickname = name,
             email = email,
             passwordHash = null,
@@ -89,7 +103,8 @@ class AuthService(
             providerUserId = providerId
         )
 
-        return jwtTokenProvider.createToken(authAccount.email!!)
+        userServiceClient.createUserWithAuthAccount(request)
+        return jwtTokenProvider.createToken(email)
     }
 
     fun authenticateApple(idTokenString: String): String {
@@ -102,29 +117,30 @@ class AuthService(
 
         val claims: JWTClaimsSet = jwtProcessor.process(idTokenString, null)
 
-        // 🔐 보안 필수 검증
         require(claims.issuer == "https://appleid.apple.com") { "Invalid issuer: ${claims.issuer}" }
         require(claims.audience.contains(appleClientId)) { "Invalid audience: ${claims.audience}" }
 
-        val providerId = claims.subject  // Apple 고유 사용자 ID (변하지 않음)
-        val email = claims.getStringClaim("email") ?: "user-$providerId@apple.local" // 첫 로그인 외 null 가능
+        val providerId = claims.subject
+        val email = claims.getStringClaim("email") ?: "user-$providerId@apple.local"
 
-        val existingAuthAccount = userService.findAuthAccountByProvider("APPLE", providerId)
+        val existingAuthAccount = userServiceClient.findAuthAccountByProvider("APPLE", providerId).data
         if (existingAuthAccount != null) {
             return jwtTokenProvider.createToken(existingAuthAccount.email!!)
         }
 
-        val emailAuthAccount = userService.findAuthAccountByEmail(email)
+        val emailAuthAccount = userServiceClient.findAuthAccountByEmail(email).data
         if (emailAuthAccount != null) {
             if (emailAuthAccount.provider == null) {
-                emailAuthAccount.provider = "APPLE"
-                emailAuthAccount.providerUserId = providerId
-                userService.saveAuthAccount(emailAuthAccount)
+                val updatedAccount = emailAuthAccount.copy(
+                    provider = "APPLE",
+                    providerUserId = providerId
+                )
+                userServiceClient.updateAuthAccount(emailAuthAccount.id!!, updatedAccount)
             }
             return jwtTokenProvider.createToken(email)
         }
 
-        val (user, authAccount) = userService.createUserWithAuthAccount(
+        val request = CreateUserWithAuthRequest(
             nickname = "",
             email = email,
             passwordHash = null,
@@ -132,7 +148,7 @@ class AuthService(
             providerUserId = providerId
         )
 
-        return jwtTokenProvider.createToken(authAccount.email!!)
+        userServiceClient.createUserWithAuthAccount(request)
+        return jwtTokenProvider.createToken(email)
     }
-
 }
