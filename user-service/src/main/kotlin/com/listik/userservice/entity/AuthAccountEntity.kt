@@ -34,10 +34,10 @@ class AuthAccountEntity(
     @Column(nullable = true, length = 256)
     var passwordHash: String? = null,
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     var provider: String? = null,             // "GOOGLE", "APPLE"
 
-    @Column(nullable = false, length = 191)
+    @Column(nullable = true, length = 191)
     var providerUserId: String? = null,
 
     @CreationTimestamp
