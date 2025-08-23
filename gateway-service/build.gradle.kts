@@ -20,18 +20,23 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":core-service"))
-
+    // Kotlin dependencies
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation(project(":core-service"))
 
-    // Minimal Spring Cloud Gateway dependencies
+    // Spring Cloud Gateway dependencies
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     
+    // JWT validation
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+    
+    // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

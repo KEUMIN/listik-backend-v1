@@ -26,21 +26,19 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(project(":core-service"))
 
+    // Spring Boot starters
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
-    // ✅ Hibernate에서 사용하는 공통 어노테이션 의존성 명시
-    implementation("org.hibernate.common:hibernate-commons-annotations:6.0.6.Final")
-
-
-    // Environment variables support
-    implementation("io.github.cdimascio:dotenv-java:3.0.0")
-
-    runtimeOnly("org.postgresql:postgresql")
-    
-    // Actuator for health checks
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // Database
+    runtimeOnly("org.postgresql:postgresql")
+    
+    // JWT dependencies (for HMAC validation)
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+    
     // Swagger/OpenAPI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 

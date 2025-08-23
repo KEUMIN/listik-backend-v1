@@ -25,37 +25,30 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(project(":core-service"))
 
+    // Spring Boot starters
     implementation("org.springframework.boot:spring-boot-starter-web")
-
-    // Spring Security + OAuth2
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    // Google OAuth2 dependencies
+    // OAuth2 dependencies
     implementation("com.google.api-client:google-api-client:2.7.2")
     implementation("com.google.http-client:google-http-client:1.47.0")
     implementation("com.google.http-client:google-http-client-gson:1.47.0")
-
-    // Apple OAuth2 dependencies
     implementation("com.nimbusds:nimbus-jose-jwt:9.31")
 
     // JWT dependencies
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-
-    // Environment variables support
-    implementation("io.github.cdimascio:dotenv-java:3.0.0")
-
-    // Actuator for health checks
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-
+    
+    // FeignClient for inter-service communication
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+    
     // Swagger/OpenAPI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
-    // FeignClient for inter-service communication
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-
+    // Test dependencies
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
