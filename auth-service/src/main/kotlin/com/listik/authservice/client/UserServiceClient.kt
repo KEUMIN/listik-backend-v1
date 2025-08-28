@@ -1,10 +1,11 @@
 package com.listik.authservice.client
 
+import com.listik.authservice.config.FeignConfig
 import com.listik.coreservice.dto.ApiResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.*
 
-@FeignClient(name = "user-service", url = "\${services.user-service.url}")
+@FeignClient(name = "user-service", url = "\${services.user-service.url}", configuration = [FeignConfig::class])
 interface UserServiceClient {
 
     @GetMapping("/users/auth-account/email/{email}")
