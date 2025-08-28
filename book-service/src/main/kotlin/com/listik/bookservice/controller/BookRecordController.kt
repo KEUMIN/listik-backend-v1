@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.*
 
 @SecurityRequirement(name = "JWT")
 @RestController
-@RequestMapping("/book-records")
+@RequestMapping("/books")
 @Tag(name = "책 기록 API", description = "책 생성/조회/수정/삭제 및 검색 API")
 class BookRecordController(
     private val service: BookRecordUseCase
 ) {
     @Operation(summary = "책 생성", description = "새 책을 등록합니다.")
-    @PostMapping
+    @PostMapping("/book-records")
     fun create(@RequestBody request: CreateBookRequest): ResponseEntity<ApiResponse<BookResponse>> {
         val created = service.create(request.toCommand())
         return ResponseEntity
@@ -33,7 +33,7 @@ class BookRecordController(
             ))
     }
     @Operation(summary = "책 수정", description = "책 정보를 수정합니다.")
-    @PutMapping("/{id}")
+    @PutMapping("/book-records/{id}")
     fun update(
         @PathVariable id: Long,
         @RequestBody request: UpdateBookRequest
@@ -46,14 +46,14 @@ class BookRecordController(
             ))
     }
     @Operation(summary = "단일 책 조회", description = "ID로 책 하나를 조회합니다.")
-    @GetMapping("/{id}")
+    @GetMapping("/book-records/{id}")
     fun getOne(@PathVariable id: Long): ResponseEntity<ApiResponse<BookResponse>> {
         val book = service.getOne(id)
         return ResponseEntity
             .ok(ApiResponse.success(BookResponse.from(book)))
     }
     @Operation(summary = "상태별 책 목록 조회 (스크롤 페이징)", description = "유저 ID와 상태에 따라 책 목록을 페이징 조회합니다.")
-    @GetMapping("/user/{userId}/status")
+    @GetMapping("/book-records/user/{userId}/status")
     fun getAllByUserAndStatus(
         @PathVariable userId: Long,
         @RequestParam status: BookRecord.Status,
@@ -69,7 +69,7 @@ class BookRecordController(
     }
 
     @Operation(summary = "책 검색", description = "제목/작가 키워드로 검색")
-    @GetMapping("/search")
+    @GetMapping("/book-records/search")
     fun search(
         @RequestParam userId: Long,
         @RequestParam keyword: String
@@ -80,7 +80,7 @@ class BookRecordController(
             .ok(ApiResponse.success(results))
     }
     @Operation(summary = "책 삭제", description = "책 기록을 삭제합니다.")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/book-records/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<ApiResponse<Unit>> {
         service.delete(id)
         return ResponseEntity
