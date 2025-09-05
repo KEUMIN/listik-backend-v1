@@ -49,3 +49,6 @@ application.yml
 
 ### SQL Files ###
 *.sql
+
+### Kubernetes ###
+k8s/*.yaml
