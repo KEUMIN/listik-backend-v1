@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: book-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+  
+  datasource:
+    url: ${BOOK_DATASOURCE_URL}
+    username: ${BOOK_DATASOURCE_USERNAME}
+    password: ${BOOK_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  sql:
+    init:
+      platform: postgresql
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_SERVICE_URL}
+
+server:
+  port: 8083
+
+jwt:
+  secret: ${JWT_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.listik.bookservice: DEBUG
+    org.springframework.data.jpa: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.security: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
