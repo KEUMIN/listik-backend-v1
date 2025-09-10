@@ -1,0 +1,101 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "auth-service/**"
+      - "user-service/**"
+      - "book-service/**"
+      - "gateway-service/**"
+
+permissions:
+  id-token: write   # OIDC 사용 시 필요
+  contents: write   # 매니페스트 갱신 커밋 푸시용
+
+jobs:
+  build-push-bump:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: auth-service
+            path: auth-service
+          - name: user-service
+            path: user-service
+          - name: book-service
+            path: book-service
+          - name: gateway-service
+            path: gateway-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Detect changes
+        id: changed
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -E "^${{ matrix.path }}/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      # --- Credential 필수 ---
+      - name: Configure AWS Credentials (OIDC 권장)
+        if: steps.changed.outputs.changed == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-action-role
+          role-session-name: github-actions-ecr
+
+      # 대안: Access Key 기반 (권장X)
+      # - name: Configure AWS Credentials
+      #   if: steps.changed.outputs.changed == 'true'
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: steps.changed.outputs.changed == 'true'
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set vars
+        if: steps.changed.outputs.changed == 'true'
+        id: vars
+        run: |
+          echo "short_sha=${GITHUB_SHA::12}" >> $GITHUB_OUTPUT
+          echo "registry=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com" >> $GITHUB_OUTPUT
+
+      - name: Build & Push Docker Image
+        if: steps.changed.outputs.changed == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.path }}/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.vars.outputs.registry }}/${{ matrix.name }}:${{ steps.vars.outputs.short_sha }}
+            ${{ steps.vars.outputs.registry }}/${{ matrix.name }}:latest
+
+      - name: Update kustomization.yaml
+        if: steps.changed.outputs.changed == 'true'
+        uses: mikefarah/yq@v4
+        with:
+          cmd: |
+            yq -i '
+              (.images[] | select(.name == "${{ steps.vars.outputs.registry }}/${{ matrix.name }}").newTag)
+              = "${{ steps.vars.outputs.short_sha }}"
+            ' deploy/overlays/prod/kustomization.yaml
+
+      - name: Commit & Push manifest bump
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deploy/overlays/prod/kustomization.yaml
+          git commit -m "chore(ci): bump ${{ matrix.name }} to ${{ steps.vars.outputs.short_sha }}"
+          git push
