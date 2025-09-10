@@ -44,11 +44,8 @@ out/
 .env.local
 .env.*.local
 
-### settings ###
-application.yml
-
 ### SQL Files ###
 *.sql
 
-### Kubernetes ###
+### Kubernetes - local ###
 k8s/*.yaml
