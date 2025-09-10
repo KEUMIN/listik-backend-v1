@@ -1,0 +1,94 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+  namespace: listik-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      imagePullSecrets:
+        - name: ecr-creds
+      containers:
+        - name: gateway-service
+          image: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/gateway-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: AUTH_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: AUTH_SERVICE_URL
+            - name: USER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USER_SERVICE_URL
+            - name: BOOK_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BOOK_SERVICE_URL                  
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: JWT_SECRET
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+              
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 30 # 30번 실패할 때까지 기다림 (30 * 10초 = 최대 5분)
+            periodSeconds: 10
+          
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10 # startupProbe 성공 후 10초 뒤부터 시작
+            periodSeconds: 15
+            
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 5  # startupProbe 성공 후 5초 뒤부터 시작
+            periodSeconds: 10
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: listik-prod
+spec:
+  type: ClusterIP
+  selector:
+    app: gateway-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

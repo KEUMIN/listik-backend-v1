@@ -1,0 +1,13 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: listik-prod
+data:
+  USER_DATASOURCE_URL: "jdbc:postgresql://listik-prod-db.cfugaiymsrb4.ap-northeast-2.rds.amazonaws.com:5432/listik_db?currentSchema=user"
+  BOOK_DATASOURCE_URL: "jdbc:postgresql://listik-prod-db.cfugaiymsrb4.ap-northeast-2.rds.amazonaws.com:5432/listik_db?currentSchema=book"
+  SPRING_PROFILES_ACTIVE: "prod"
+  AUTH_SERVICE_URL: "http://auth-service:8081"
+  USER_SERVICE_URL: "http://user-service:8082"
+  BOOK_SERVICE_URL: "http://auth-service:8083"
