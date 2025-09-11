@@ -29,7 +29,7 @@ spec:
                   key: SPRING_PROFILES_ACTIVE
             - name: SPRING_DATASOURCE_URL
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: app-config
                   key: USER_DATASOURCE_URL
             - name: SPRING_DATASOURCE_USERNAME
