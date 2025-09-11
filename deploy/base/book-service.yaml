@@ -44,7 +44,7 @@ spec:
                   key: BOOK_DATASOURCE_PASSWORD
             - name: AUTH_SERVICE_URL
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: app-config
                   key: AUTH_SERVICE_URL
             - name: JWT_SECRET
