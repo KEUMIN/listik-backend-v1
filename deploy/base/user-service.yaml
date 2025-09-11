@@ -34,7 +34,7 @@ spec:
                   key: USER_DATASOURCE_URL
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: app-secrets
                   key: USER_DATASOURCE_USERNAME
             - name: SPRING_DATASOURCE_PASSWORD
