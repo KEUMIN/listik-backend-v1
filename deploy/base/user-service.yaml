@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,7 +29,7 @@ spec:
                   key: SPRING_PROFILES_ACTIVE
             - name: SPRING_DATASOURCE_URL
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: app-config
                   key: USER_DATASOURCE_URL
             - name: SPRING_DATASOURCE_USERNAME
@@ -47,7 +46,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-config
-                  key: AUTH_SERVICE_URL                  
+                  key: AUTH_SERVICE_URL
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -65,7 +64,7 @@ spec:
             limits:
               cpu: "500m"
               memory: "1Gi"
-              
+
           startupProbe:
             httpGet:
               path: /actuator/health
@@ -79,7 +78,7 @@ spec:
               port: 8082
             initialDelaySeconds: 10 # startupProbe 성공 후 10초 뒤부터 시작
             periodSeconds: 15
-            
+
           readinessProbe:
             httpGet:
               path: /actuator/health
