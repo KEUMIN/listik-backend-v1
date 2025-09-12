@@ -14,6 +14,6 @@ images:
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/user-service
     newTag: latest
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/book-service
-    newTag: latest
+    newTag: abc1ccc78e81
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/gateway-service
     newTag: latest
