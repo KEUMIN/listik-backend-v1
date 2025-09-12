@@ -1,3 +1,4 @@
+# 최종 수정일시: 2025-09-12 15:46
 spring:
   application:
     name: gateway-service
