@@ -9,11 +9,11 @@ resources:
 #patches:
 #  - path: patches/replicas.yaml
 images:
-  - name: 590123456789.dkr.ecr.ap-northeast-2.amazonaws.com/auth-service
+  - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/auth-service
     newTag: dev
-  - name: 590123456789.dkr.ecr.ap-northeast-2.amazonaws.com/user-service
+  - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/user-service
     newTag: dev
-  - name: 590123456789.dkr.ecr.ap-northeast-2.amazonaws.com/book-service
+  - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/book-service
     newTag: dev
-  - name: 590123456789.dkr.ecr.ap-northeast-2.amazonaws.com/gateway-service
+  - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/gateway-service
     newTag: dev
