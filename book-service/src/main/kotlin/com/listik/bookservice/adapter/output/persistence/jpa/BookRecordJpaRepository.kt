@@ -4,9 +4,10 @@ import com.listik.bookservice.adapter.output.persistence.entity.BookRecordEntity
 import com.listik.bookservice.domain.eunum.BookRecordStatus
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
+import org.springframework.data.repository.CrudRepository
 
 interface BookRecordJpaRepository :
-    org.springframework.data.jpa.repository.JpaRepository<BookRecordEntity, Long> {
+    CrudRepository<BookRecordEntity, Long> {
     fun findAllByUserIdAndStatus(
         userId: Long,
         status: BookRecordStatus,

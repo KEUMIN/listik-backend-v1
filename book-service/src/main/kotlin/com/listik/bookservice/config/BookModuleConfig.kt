@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @Configuration
-@EnableJpaRepositories(basePackages = ["com.listik.bookservice.adapter.persistence"])
-@EntityScan("com.listik.bookservice.adapter.persistence.entity")
+@EnableJpaRepositories(basePackages = ["com.listik.bookservice.adapter.output.persistence"])
+@EntityScan("com.listik.bookservice.adapter.output.persistence.entity")
 class BookModuleConfig

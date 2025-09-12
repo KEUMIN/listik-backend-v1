@@ -8,9 +8,9 @@ import com.listik.bookservice.domain.port.output.BookRecordRepositoryPort
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.Sort
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 
-@Repository
+@Component
 class BookRecordPersistenceAdapter(
     private val jpaRepository: BookRecordJpaRepository
 ) : BookRecordRepositoryPort {
