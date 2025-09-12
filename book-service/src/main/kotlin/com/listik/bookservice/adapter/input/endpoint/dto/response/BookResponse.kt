@@ -1,7 +1,8 @@
-package com.listik.bookservice.dto.response
+package com.listik.bookservice.adapter.input.endpoint.dto.response
 
+import com.listik.bookservice.domain.eunum.BookRecordStatus
 import com.listik.bookservice.domain.model.BookRecord
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class BookResponse(
     val id: Long,
@@ -10,13 +11,13 @@ data class BookResponse(
     val author: String?,
     val coverUrl: String?,
     val isbn: String?,
-    val status: BookRecord.Status,
-    val startedAt: LocalDateTime?,
-    val completedAt: LocalDateTime?,
-    val createdAt: LocalDateTime?,
-    val updatedAt: LocalDateTime?,
-    val rating: Int?,
-    val review: String?
+    val status: BookRecordStatus,
+    val startedAt: Instant,
+    val completedAt: Instant?,
+    val rating: Double?,
+    val review: String?,
+    val totalPageNumber: Int,
+    val currentPageNumber: Int,
 ) {
     companion object {
         fun from(book: BookRecord): BookResponse =
@@ -30,10 +31,10 @@ data class BookResponse(
                 status = book.status,
                 startedAt = book.startedAt,
                 completedAt = book.completedAt,
-                createdAt = book.createdAt,
-                updatedAt = book.updatedAt,
                 rating = book.rating,
-                review = book.review
+                review = book.review,
+                totalPageNumber = book.totalPageNumber,
+                currentPageNumber = book.currentPageNumber,
             )
     }
 }

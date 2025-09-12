@@ -1,8 +1,10 @@
-package com.listik.bookservice.adapter.persistence.entity
+package com.listik.bookservice.adapter.output.persistence.entity
 
+import com.listik.bookservice.domain.eunum.BookRecordStatus
 import com.listik.bookservice.domain.model.BookRecord
+import com.listik.coreservice.entity.BaseEntity
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "book_record")
@@ -13,10 +15,10 @@ class BookRecordEntity(
     var id: Long? = null,
 
     @Column(nullable = false)
-    var userId: Long? = null,
+    var userId: Long,
 
     @Column(nullable = false)
-    var title: String? = null,
+    var title: String,
 
     var author: String? = null,
 
@@ -26,23 +28,40 @@ class BookRecordEntity(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: BookRecord.Status = BookRecord.Status.TO_READ,
+    var status: BookRecordStatus = BookRecordStatus.TO_READ,
 
-    var startedAt: LocalDateTime? = null,
+    @Column(nullable = false)
+    var startedAt: Instant,
 
-    var completedAt: LocalDateTime? = null,
+    var completedAt: Instant? = null,
 
-    var createdAt: LocalDateTime? = null,
+    var rating: Double? = null,
 
-    var updatedAt: LocalDateTime? = null,
+    @Column(nullable = false)
+    var totalPageNumber: Int,
 
-    var rating: Int? = null,
+    @Column(nullable = false)
+    var currentPageNumber: Int,
 
     @Lob
     var review: String? = null
-) {
+) : BaseEntity() {
     fun toDomain(): BookRecord =
-        BookRecord(id, userId!!, title!!, author, coverUrl, isbn, status, startedAt, completedAt, createdAt, updatedAt, rating, review)
+        BookRecord(
+            id,
+            userId,
+            title,
+            author,
+            coverUrl,
+            isbn,
+            status,
+            startedAt,
+            completedAt,
+            rating,
+            review,
+            totalPageNumber,
+            currentPageNumber
+        )
 
     companion object {
         fun from(domain: BookRecord): BookRecordEntity =
@@ -56,10 +75,10 @@ class BookRecordEntity(
                 status = domain.status,
                 startedAt = domain.startedAt,
                 completedAt = domain.completedAt,
-                createdAt = domain.createdAt,
-                updatedAt = domain.updatedAt,
                 rating = domain.rating,
-                review = domain.review
+                review = domain.review,
+                totalPageNumber = domain.totalPageNumber,
+                currentPageNumber = domain.currentPageNumber
             )
     }
 }
