@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -42,12 +41,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: GOOGLE_CLIENT_SECRET   
+                  key: GOOGLE_CLIENT_SECRET
             - name: APPLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: APPLE_CLIENT_ID                    
+                  key: APPLE_CLIENT_ID
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -58,6 +57,11 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: SERVICE_AUTH_SECRET
+            - name: USER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: USER_SERVICE_URL
           resources:
             requests:
               cpu: "200m"

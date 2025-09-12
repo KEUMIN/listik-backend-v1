@@ -23,7 +23,16 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation(project(":core-service"))
+    implementation(project(":core-service")) {
+        // 전이되는 DB 관련 막기
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-jdbc")
+        exclude(group = "com.zaxxer", module = "HikariCP")
+        exclude(group = "org.hibernate.orm", module = "hibernate-core")
+        exclude(group = "org.hibernate", module = "hibernate-core")
+        exclude(group = "org.flywaydb", module = "flyway-core")
+        exclude(group = "org.liquibase", module = "liquibase-core")
+    }
 
     // Spring Boot starters
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -41,10 +50,10 @@ dependencies {
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    
+
     // FeignClient for inter-service communication
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    
+
     // Swagger/OpenAPI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
