@@ -10,7 +10,7 @@ resources:
 #  - path: patches/replicas.yaml
 images:
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/auth-service
-    newTag: a61b58dfb461
+    newTag: 00038564c040
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/user-service
     newTag: 22ccf387e671
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/book-service
