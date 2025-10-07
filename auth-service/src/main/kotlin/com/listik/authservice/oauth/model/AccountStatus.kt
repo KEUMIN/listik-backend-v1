@@ -8,9 +8,5 @@ sealed class AccountStatus {
         val authAccount: AuthAccountDto
     ) : AccountStatus()
 
-    data class ExistingEmailAccount(
-        val authAccount: AuthAccountDto
-    ) : AccountStatus()
-
     data object NewAccount : AccountStatus()
 }

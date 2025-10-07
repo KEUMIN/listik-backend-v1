@@ -2,9 +2,13 @@ package com.listik.userservice.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
 
+/**
+ * OAuth provider 연결 정보만 보관
+ * - email, password 등 민감 정보는 저장하지 않음
+ * - provider + providerUserId로 중복 가입 방지
+ */
 @Entity
 @Table(
     name = "auth_accounts",
@@ -13,10 +17,6 @@ import java.time.Instant
         UniqueConstraint(
             name = "uk_oauth_provider_sub",
             columnNames = ["provider", "provider_user_id"]
-        ),
-        UniqueConstraint(
-            name = "uk_oauth_local_email",
-            columnNames = ["email"]
         )
     ]
 )
@@ -28,25 +28,19 @@ class AuthAccountEntity(
     @JoinColumn(name = "user_id", nullable = false)
     var user: UserEntity,
 
-    @Column(nullable = true, length = 256)
-    var email: String? = null,
+    @Column(nullable = false, length = 20)
+    var provider: String,  // "GOOGLE", "APPLE"
 
-    @Column(nullable = true, length = 256)
-    var passwordHash: String? = null,
-
-    @Column(nullable = true, length = 20)
-    var provider: String? = null,             // "GOOGLE", "APPLE"
-
-    @Column(nullable = true, length = 191)
-    var providerUserId: String? = null,
+    @Column(nullable = false, length = 191, name = "provider_user_id")
+    var providerUserId: String,  // OAuth provider의 sub claim
 
     @CreationTimestamp
-    var createdAt: Instant? = null,
-
-    @UpdateTimestamp
-    var updatedAt: Instant? = null
+    @Column(nullable = false, updatable = false)
+    var createdAt: Instant? = null
 ) {
     constructor() : this(
-        user = UserEntity()
+        user = UserEntity(),
+        provider = "",
+        providerUserId = ""
     )
 }

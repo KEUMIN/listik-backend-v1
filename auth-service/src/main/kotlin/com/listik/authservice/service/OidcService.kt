@@ -122,8 +122,8 @@ class OidcService(
         }
         val jwtToken = oauth2AuthenticationManager.authenticate(providerType, idToken)
 
-        // JWT 토큰에서 사용자 이메일 추출
-        val email = jwtTokenProvider.getEmail(jwtToken)
+        // JWT 토큰에서 사용자 ID 추출
+        val userId = jwtTokenProvider.getEmail(jwtToken)  // 실제로는 userId가 저장됨
 
         // 자체 authorization code 생성
         val authorizationCode = pkceService.generateAuthorizationCode()
@@ -135,7 +135,7 @@ class OidcService(
             codeChallengeMethod = oauth2State.codeChallengeMethod,
             redirectUri = oauth2State.redirectUri,
             state = oauth2State.clientState,
-            email = email,
+            email = userId,  // 실제로는 userId를 저장
             provider = provider,
             createdAt = System.currentTimeMillis()
         )
@@ -189,17 +189,15 @@ class OidcService(
      * Access token으로 사용자 정보 조회
      */
     fun getUserInfo(accessToken: String): UserInfoResponse {
-        val email = jwtTokenProvider.getEmail(accessToken)
-        val authAccount = userServiceClient.findAuthAccountByEmail(email).data
-            ?: throw IllegalArgumentException("User not found")
+        val userId = jwtTokenProvider.getEmail(accessToken)  // JWT에는 userId(UUID)가 저장되어 있음
 
         return UserInfoResponse(
-            sub = email,
-            email = email,
+            sub = userId,
+            email = null,  // 민감 정보는 제공하지 않음
             emailVerified = true,
-            name = authAccount.user?.nickname,
+            name = null,  // 민감 정보는 제공하지 않음
             picture = null,
-            provider = authAccount.provider
+            provider = null  // 필요시 별도 조회
         )
     }
 

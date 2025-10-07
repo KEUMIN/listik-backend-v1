@@ -2,46 +2,25 @@ package com.listik.userservice.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
+import java.util.UUID
 
+/**
+ * 최소한의 사용자 메타데이터만 보관
+ * - 민감 정보(email, nickname 등)는 OAuth provider가 관리
+ * - 앱 내 데이터 연결을 위한 UUID만 유지
+ */
 @Entity
-@Table(
-    name = "users",
-    indexes = [Index(name = "idx_users_email", columnList = "email")],
-)
+@Table(name = "users")
 class UserEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
-
-    @Column(nullable = true, length = 256)
-    var email: String? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    var id: UUID? = null,
 
     @Column(nullable = false)
-    var emailVerified: Boolean = false,
-
-    @Column(nullable = false, length = 100)
-    var nickname: String = "",
-
-    @Column(nullable = false, length = 20)
-    var role: String = "USER",
-
-    @Column(nullable = false)
-    var tokenVersion: Int = 0,
-
-    @Column(length = 20)
-    var locale: String? = null,       // e.g. "ko-KR"
-
-    @Column(length = 50)
-    var timeZone: String? = null,     // e.g. "Asia/Seoul"
-
-    var lastLoginAt: Instant? = null,
+    var tokenVersion: Int = 0,  // 강제 로그아웃을 위한 버전
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    var createdAt: Instant? = null,
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    var updatedAt: Instant? = null
+    var createdAt: Instant? = null
 )

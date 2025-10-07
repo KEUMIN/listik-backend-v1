@@ -17,10 +17,7 @@ class OAuth2AccountManager(
     fun processAuthentication(userInfo: OAuth2UserInfo): String =
         when (val accountStatus = determineAccountStatus(userInfo)) {
             is AccountStatus.ExistingOAuthAccount ->
-                handleExistingOAuthAccount(accountStatus.authAccount)
-
-            is AccountStatus.ExistingEmailAccount ->
-                handleExistingEmailAccount(accountStatus.authAccount, userInfo)
+                handleExistingOAuthAccount(accountStatus.authAccount, userInfo)
 
             is AccountStatus.NewAccount -> handleNewAccount(userInfo)
         }
@@ -34,57 +31,24 @@ class OAuth2AccountManager(
             return AccountStatus.ExistingOAuthAccount(existingOAuthAccount)
         }
 
-        val existingEmailAccount = userServiceClient
-            .findAuthAccountByEmail(userInfo.email)
-            .data
-
-        if (existingEmailAccount != null) {
-            return AccountStatus.ExistingEmailAccount(existingEmailAccount)
-        }
-
         return AccountStatus.NewAccount
     }
 
-    private fun handleExistingOAuthAccount(authAccount: AuthAccountDto): String {
-        requireNotNull(authAccount.email)
-        return jwtTokenProvider.createToken(authAccount.email)
-    }
-
-    private fun handleExistingEmailAccount(
-        authAccount: AuthAccountDto,
-        userInfo: OAuth2UserInfo
-    ): String {
-        requireNotNull(authAccount.id)
-        requireNotNull(authAccount.email)
-
-        if (authAccount.provider == null) {
-            val updatedAccount = authAccount.copy(
-                provider = userInfo.provider.displayName,
-                providerUserId = userInfo.providerId
-            )
-            userServiceClient.updateAuthAccount(authAccount.id, updatedAccount)
-        }
-
-        return jwtTokenProvider.createToken(authAccount.email)
+    private fun handleExistingOAuthAccount(authAccount: AuthAccountDto, userInfo: OAuth2UserInfo): String {
+        requireNotNull(authAccount.userId)
+        // JWT에 userId(UUID)를 저장
+        return jwtTokenProvider.createToken(authAccount.userId.toString())
     }
 
     private fun handleNewAccount(userInfo: OAuth2UserInfo): String {
         val request = CreateUserWithAuthRequest(
-            nickname = userInfo.name ?: generateDefaultNickname(userInfo),
-            email = userInfo.email,
-            passwordHash = null,
             provider = userInfo.provider.displayName,
             providerUserId = userInfo.providerId
         )
 
-        userServiceClient.createUserWithAuthAccount(request)
+        val response = userServiceClient.createUserWithAuthAccount(request)
 
-        return jwtTokenProvider.createToken(userInfo.email)
+        // JWT에 userId(UUID)를 저장
+        return jwtTokenProvider.createToken(response.data!!.userId.toString())
     }
-
-    private fun generateDefaultNickname(userInfo: OAuth2UserInfo): String =
-        when (userInfo.provider) {
-            OAuth2ProviderType.GOOGLE -> userInfo.name ?: "User"
-            OAuth2ProviderType.APPLE -> "User"
-        }
 }
