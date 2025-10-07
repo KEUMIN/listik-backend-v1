@@ -1,10 +1,10 @@
 package com.listik.userservice.dto.response
 
+import java.util.UUID
+
 data class AuthAccountDto(
     val id: Long?,
-    val email: String?,
-    val passwordHash: String?,
-    val provider: String?,
-    val providerUserId: String?,
-    val userId: Long?
+    val provider: String,
+    val providerUserId: String,
+    val userId: UUID?
 )

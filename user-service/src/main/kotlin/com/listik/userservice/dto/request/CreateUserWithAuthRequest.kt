@@ -1,9 +1,6 @@
 package com.listik.userservice.dto.request
 
 data class CreateUserWithAuthRequest(
-    val nickname: String,
-    val email: String,
-    val passwordHash: String?,
-    val provider: String?,
-    val providerUserId: String?
+    val provider: String,
+    val providerUserId: String
 )

@@ -13,16 +13,8 @@ class DefaultUserService (
     private val userRepository: UserRepository,
     private val authAccountRepository: AuthAccountRepository
 ): UserService {
-    override fun findByEmail(email: String): UserEntity? {
-        return authAccountRepository.findByEmail(email)?.user
-    }
-
     override fun save(userEntity: UserEntity): UserEntity {
         return userRepository.save(userEntity)
-    }
-
-    override fun findAuthAccountByEmail(email: String): AuthAccountEntity? {
-        return authAccountRepository.findByEmail(email)
     }
 
     override fun findAuthAccountByProvider(provider: String, providerUserId: String): AuthAccountEntity? {
@@ -35,18 +27,13 @@ class DefaultUserService (
 
     @Transactional
     override fun createUserWithAuthAccount(
-        nickname: String, 
-        email: String?, 
-        passwordHash: String?, 
-        provider: String?, 
-        providerUserId: String?
+        provider: String,
+        providerUserId: String
     ): Pair<UserEntity, AuthAccountEntity> {
-        val user = userRepository.save(UserEntity(nickname = nickname))
+        val user = userRepository.save(UserEntity())
         val authAccount = authAccountRepository.save(
             AuthAccountEntity(
                 user = user,
-                email = email,
-                passwordHash = passwordHash,
                 provider = provider,
                 providerUserId = providerUserId
             )
