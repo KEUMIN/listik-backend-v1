@@ -61,7 +61,13 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000
+  expiration: 86400000  # 24시간 (밀리초)
+  refresh-expiration: 604800000  # 7일 (밀리초)
+
+apple:
+  team-id: ${APPLE_TEAM_ID:}
+  key-id: ${APPLE_KEY_ID:}
+  private-key-path: ${APPLE_PRIVATE_KEY_PATH:classpath:apple-private-key.p8}
 
 service:
   auth:
@@ -90,8 +96,14 @@ management:
 logging:
   level:
     com.listik.authservice: DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.security: TRACE
+    org.springframework.security.web: TRACE
+    org.springframework.security.oauth2: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet: DEBUG
     feign: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 springdoc:
   api-docs:
