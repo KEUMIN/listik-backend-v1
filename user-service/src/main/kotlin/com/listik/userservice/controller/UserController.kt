@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
-class UserInternalController(
+class UserController(
     private val userService: UserService
 ) {
 
