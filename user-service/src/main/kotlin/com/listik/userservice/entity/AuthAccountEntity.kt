@@ -26,21 +26,19 @@ class AuthAccountEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: UserEntity,
+    var user: UserEntity = UserEntity(),
 
     @Column(nullable = false, length = 20)
-    var provider: String,  // "GOOGLE", "APPLE"
+    var provider: String = "",  // "GOOGLE", "APPLE"
 
     @Column(nullable = false, length = 191, name = "provider_user_id")
-    var providerUserId: String,  // OAuth provider의 sub claim
+    var providerUserId: String = "",  // OAuth provider의 sub claim
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    var role: Role = Role.USER,
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     var createdAt: Instant? = null
-) {
-    constructor() : this(
-        user = UserEntity(),
-        provider = "",
-        providerUserId = ""
-    )
-}
+)

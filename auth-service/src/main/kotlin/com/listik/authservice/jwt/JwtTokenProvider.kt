@@ -18,12 +18,13 @@ class JwtTokenProvider(
     private val key: SecretKey = Keys.hmacShaKeyFor(secret.toByteArray(StandardCharsets.UTF_8))
     private val secureRandom = SecureRandom()
 
-    fun createToken(email: String): String {
+    fun createToken(email: String, roles: List<String> = listOf("USER")): String {
         val now = Date()
         val expiry = Date(now.time + expiration)
 
         return Jwts.builder()
             .setSubject(email)
+            .claim("roles", roles)
             .setIssuedAt(now)
             .setExpiration(expiry)
             .signWith(key, SignatureAlgorithm.HS256)

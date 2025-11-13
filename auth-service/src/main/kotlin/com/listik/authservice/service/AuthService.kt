@@ -76,9 +76,10 @@ class AuthService(
         // 새 Refresh Token 저장
         refreshTokenRepository.save(refreshToken)
 
-        // 응답 생성
+        val accessTokenWithRole = jwtTokenProvider.createToken(userId.toString(), listOf(authAccount.role))
+
         return AuthResponse(
-            accessToken = accessToken,
+            accessToken = accessTokenWithRole,
             refreshToken = refreshTokenValue,
             user = UserDto(
                 id = userId,
@@ -99,8 +100,17 @@ class AuthService(
         val refreshToken = refreshTokenRepository.findByToken(refreshTokenValue)
             ?: throw IllegalArgumentException("Invalid refresh token")
 
-        // 새로운 Access Token 생성
-        val newAccessToken = jwtTokenProvider.createToken(refreshToken.userId.toString())
+        // 사용자 인증 계정 정보 조회 (현재 역할 정보 포함)
+        val authAccountResponse = userServiceClient.findAuthAccountByProvider(
+            provider = refreshToken.provider,
+            providerUserId = refreshToken.providerUserId
+        )
+
+        val authAccount = authAccountResponse.data
+            ?: throw IllegalStateException("AuthAccount not found for refresh")
+
+        // 새로운 Access Token 생성 (현재 역할 포함)
+        val newAccessToken = jwtTokenProvider.createToken(refreshToken.userId.toString(), listOf(authAccount.role))
 
         // 새로운 Refresh Token 생성
         val newRefreshTokenValue = jwtTokenProvider.createRefreshToken()

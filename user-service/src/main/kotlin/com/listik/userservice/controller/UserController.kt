@@ -25,7 +25,8 @@ class UserController(
                 id = it.id,
                 provider = it.provider,
                 providerUserId = it.providerUserId,
-                userId = it.user.id
+                userId = it.user.id,
+                role = it.role.toString()
             )
         }
         return ResponseEntity.ok(ApiResponse.success(dto))
