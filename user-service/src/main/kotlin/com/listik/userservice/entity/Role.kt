@@ -5,5 +5,5 @@ package com.listik.userservice.entity
  */
 enum class Role {
     USER,
-    Service,
+    SERVICE,
 }

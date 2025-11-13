@@ -1,9 +1,9 @@
 package com.listik.userservice.config
 
+import com.listik.userservice.entity.Role
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -28,7 +28,7 @@ class ServiceAuthenticationFilter(
             val authentication = UsernamePasswordAuthenticationToken(
                 "internal-service",
                 null,
-                listOf(SimpleGrantedAuthority("ROLE_SERVICE"))
+                listOf(SimpleGrantedAuthority("ROLE_${Role.SERVICE.name}"))
             )
             SecurityContextHolder.getContext().authentication = authentication
         }

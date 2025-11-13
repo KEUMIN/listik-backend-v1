@@ -1,5 +1,6 @@
 package com.listik.userservice.config
 
+import com.listik.userservice.entity.Role
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,7 +35,7 @@ class SecurityConfig(
             .addFilterBefore(gatewayAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/users/auth-account/**", "/users/create-with-auth").hasRole("SERVICE")
+                    .requestMatchers("/users/auth-account/**", "/users/create-with-auth").hasRole(Role.SERVICE.name)
                     .requestMatchers("/users/me").hasRole("USER")
                     .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     .anyRequest().denyAll()
