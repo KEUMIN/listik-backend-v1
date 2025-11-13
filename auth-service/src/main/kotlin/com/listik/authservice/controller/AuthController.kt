@@ -54,4 +54,23 @@ class AuthController(
         val authResponse = authService.refreshTokens(request.refreshToken)
         return ResponseEntity.ok(ApiResponse.success(authResponse))
     }
+
+    @Operation(
+        summary = "로그아웃",
+        description = """
+            로그아웃을 수행합니다.
+
+            처리 사항:
+            - Refresh Token 삭제
+            - Access Token을 Redis 블랙리스트에 저장 (유효기간만큼)
+        """
+    )
+    @PostMapping("/logout")
+    fun logout(
+        @RequestHeader("Authorization") authorizationHeader: String
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val accessToken = authorizationHeader.removePrefix("Bearer ").trim()
+        authService.logout(accessToken)
+        return ResponseEntity.ok(ApiResponse.success(Unit))
+    }
 }

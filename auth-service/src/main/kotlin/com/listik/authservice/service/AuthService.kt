@@ -9,8 +9,15 @@ import com.listik.authservice.oauth.OAuth2ProviderType
 import com.listik.authservice.oauth.exception.OAuth2TokenValidationException
 import com.listik.authservice.refresh.model.RefreshToken
 import com.listik.authservice.refresh.repository.RefreshTokenRepository
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.crypto.spec.SecretKeySpec
+import java.nio.charset.StandardCharsets
+import org.springframework.beans.factory.annotation.Value
 
 /**
  * 앱용 인증 서비스
@@ -22,7 +29,9 @@ class AuthService(
     private val oauth2AuthenticationManager: OAuth2AuthenticationManager,
     private val jwtTokenProvider: JwtTokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val userServiceClient: UserServiceClient
+    private val userServiceClient: UserServiceClient,
+    private val redisTemplate: RedisTemplate<String, String>,
+    @Value("\${jwt.secret}") private val jwtSecret: String
 ) {
 
     /**
@@ -160,6 +169,61 @@ class AuthService(
                 ?: throw IllegalArgumentException("ID token missing sub claim")
         } catch (e: Exception) {
             throw OAuth2TokenValidationException("Failed to extract provider user ID", e)
+        }
+    }
+
+    /**
+     * 로그아웃 처리
+     * 1. Refresh Token 삭제
+     * 2. Access Token을 Redis 블랙리스트에 저장 (유효기간만큼)
+     *
+     * @param accessToken 블랙리스트에 저장할 Access Token
+     */
+    fun logout(accessToken: String) {
+        try {
+            // Access Token 검증 및 claims 추출
+            val claims = getTokenClaims(accessToken)
+            val userId = claims.subject
+            val expirationTime = claims.expiration
+
+            // 현재 시간과 만료 시간의 차이를 계산하여 TTL 설정
+            val currentTime = System.currentTimeMillis()
+            val remainingTimeMs = expirationTime.time - currentTime
+
+            if (remainingTimeMs > 0) {
+                // Redis 블랙리스트에 Access Token 저장
+                // 키: blacklist:accessToken:{token}
+                // 값: userId
+                val blacklistKey = "blacklist:accessToken:$accessToken"
+                redisTemplate.opsForValue().set(
+                    blacklistKey,
+                    userId,
+                    remainingTimeMs,
+                    TimeUnit.MILLISECONDS
+                )
+            }
+
+            // Refresh Token 삭제 (userId로 조회하여 삭제)
+            refreshTokenRepository.deleteByUserId(UUID.fromString(userId))
+
+        } catch (e: Exception) {
+            throw IllegalArgumentException("로그아웃 처리 중 오류 발생: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Access Token의 claims를 추출합니다.
+     */
+    private fun getTokenClaims(token: String): Claims {
+        val secretKey = SecretKeySpec(jwtSecret.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
+        return try {
+            Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .body
+        } catch (e: Exception) {
+            throw IllegalArgumentException("유효하지 않은 Access Token입니다.", e)
         }
     }
 }

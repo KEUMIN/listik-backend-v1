@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class GoogleOAuth2Strategy(
     @Value("\${spring.security.oauth2.client.registration.google.client-id}")
-    private val googleClientId: String
+    private val googleClientIds: String
 ) : OAuth2AuthenticationStrategy {
 
     private val logger = LoggerFactory.getLogger(GoogleOAuth2Strategy::class.java)
@@ -27,7 +27,7 @@ class GoogleOAuth2Strategy(
             val jsonFactory = GsonFactory.getDefaultInstance()
 
             val verifier = GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(listOf(googleClientId))
+                .setAudience(googleClientIds.split(","))
                 .build()
 
             val googleIdToken: GoogleIdToken = verifier.verify(idToken)

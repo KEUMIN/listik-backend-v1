@@ -24,7 +24,9 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeExchange { exchanges ->
                 exchanges
-                    .pathMatchers("/api/v1/auth/**").permitAll()
+                    .pathMatchers("/api/v1/auth/verify").permitAll()
+                    .pathMatchers("/api/v1/auth/refresh").permitAll()
+                    .pathMatchers("/api/v1/auth/logout").authenticated()
                     .pathMatchers("/actuator/**").permitAll()
                     .anyExchange().authenticated()
             }
