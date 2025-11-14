@@ -13,11 +13,23 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter
 import org.springframework.security.web.server.SecurityWebFilterChain
 import reactor.core.publisher.Mono
 import javax.crypto.spec.SecretKeySpec
 import java.nio.charset.StandardCharsets
+
+/**
+ * JWT에서 roles 클레임을 authorities로 변환하는 컨버터
+ */
+class JwtToAuthenticationConverter : Converter<Jwt, Mono<JwtAuthenticationToken>> {
+    override fun convert(jwt: Jwt): Mono<JwtAuthenticationToken> {
+        val roles = jwt.getClaimAsStringList("roles") ?: emptyList()
+        val authorities = roles.map { SimpleGrantedAuthority("ROLE_$it") }
+
+        val token = JwtAuthenticationToken(jwt, authorities, jwt.claims["sub"].toString())
+        return Mono.just(token)
+    }
+}
 
 @Configuration
 @EnableWebFluxSecurity
@@ -51,13 +63,7 @@ class SecurityConfig {
 
     @Bean
     fun jwtAuthenticationConverter(): Converter<Jwt, Mono<JwtAuthenticationToken>> {
-        return Converter { jwt ->
-            val roles = jwt.getClaimAsStringList("roles") ?: emptyList()
-            val authorities = roles.map { SimpleGrantedAuthority("ROLE_$it") }
-
-            val token = JwtAuthenticationToken(jwt, authorities, jwt.claims["sub"].toString())
-            Mono.just(token)
-        }
+        return JwtToAuthenticationConverter()
     }
 
     @Bean
@@ -73,9 +79,13 @@ class SecurityConfig {
                         .map { it.authority }
                         .joinToString(",")
 
+                    // 클라이언트에서 X-Timezone을 보낸 경우 사용, 없으면 기본값 (UTC)
+                    val timezone = exchange.request.headers["X-Timezone"]?.firstOrNull() ?: "UTC"
+
                     val modifiedRequest = exchange.request.mutate()
                         .header("X-User-Id", userId)
                         .header("X-User-Roles", roles)
+                        .header("X-Timezone", timezone)
                         .build()
 
                     val modifiedExchange = exchange.mutate().request(modifiedRequest).build()
