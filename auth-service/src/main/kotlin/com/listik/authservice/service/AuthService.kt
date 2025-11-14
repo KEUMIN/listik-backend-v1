@@ -84,7 +84,8 @@ class AuthService(
             user = UserDto(
                 id = userId,
                 provider = authAccount.provider,
-                providerUserId = authAccount.providerUserId
+                providerUserId = authAccount.providerUserId,
+                nickName = authAccount.nickName
             )
         )
     }
@@ -135,7 +136,8 @@ class AuthService(
             user = UserDto(
                 id = refreshToken.userId,
                 provider = refreshToken.provider,
-                providerUserId = refreshToken.providerUserId
+                providerUserId = refreshToken.providerUserId,
+                nickName = authAccount.nickName
             )
         )
     }

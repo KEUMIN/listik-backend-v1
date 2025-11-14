@@ -1,8 +1,7 @@
 package com.listik.userservice.entity
 
+import com.listik.coreservice.entity.BaseEntity
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import java.time.Instant
 
 /**
  * OAuth provider 연결 정보만 보관
@@ -38,7 +37,4 @@ class AuthAccountEntity(
     @Column(nullable = false, length = 20)
     var role: Role = Role.USER,
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    var createdAt: Instant? = null
-)
+    ) : BaseEntity()

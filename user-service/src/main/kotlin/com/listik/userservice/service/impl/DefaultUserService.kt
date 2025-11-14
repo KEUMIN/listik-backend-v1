@@ -7,6 +7,7 @@ import com.listik.userservice.repository.UserRepository
 import com.listik.userservice.service.UserService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 class DefaultUserService (
@@ -39,5 +40,13 @@ class DefaultUserService (
             )
         )
         return Pair(user, authAccount)
+    }
+
+    @Transactional
+    override fun update(userId: UUID, nickName: String?): UserEntity {
+        val user = userRepository.findById(userId)
+            .orElseThrow { IllegalArgumentException("User not found with id: $userId") }
+        user.nickName = nickName
+        return userRepository.save(user)
     }
 }

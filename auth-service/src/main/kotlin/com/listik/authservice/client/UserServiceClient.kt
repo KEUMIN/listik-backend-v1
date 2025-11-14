@@ -24,7 +24,8 @@ data class AuthAccountDto(
     val provider: String,
     val providerUserId: String,
     val userId: UUID?,
-    val role: String = "USER"
+    val role: String = "USER",
+    val nickName: String? = null
 )
 
 data class CreateUserWithAuthRequest(

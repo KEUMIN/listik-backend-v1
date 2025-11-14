@@ -24,5 +24,8 @@ data class UserDto(
     val provider: String,
 
     @Schema(description = "Provider User ID", required = true)
-    val providerUserId: String
+    val providerUserId: String,
+
+    @Schema(description = "사용자 닉네임", required = false)
+    val nickName: String? = null
 )

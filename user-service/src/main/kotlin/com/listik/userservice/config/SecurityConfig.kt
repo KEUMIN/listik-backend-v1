@@ -31,13 +31,21 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .addFilterBefore(serviceAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
-            .addFilterBefore(gatewayAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(
+                serviceAuthenticationFilter(),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
+            .addFilterBefore(
+                gatewayAuthenticationFilter(),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/users/auth-account/**", "/users/create-with-auth").hasRole(Role.SERVICE.name)
-                    .requestMatchers("/users/me").hasRole("USER")
-                    .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/users/auth-account/**", "/users/create-with-auth")
+                    .hasRole(Role.SERVICE.name)
+                    .requestMatchers("/users/update").hasRole("USER")
+                    .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**")
+                    .permitAll()
                     .anyRequest().denyAll()
             }
 
