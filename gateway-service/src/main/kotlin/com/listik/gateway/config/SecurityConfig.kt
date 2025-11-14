@@ -1,10 +1,8 @@
 package com.listik.gateway.config
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cloud.gateway.filter.GlobalFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.annotation.Order
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
@@ -64,36 +62,5 @@ class SecurityConfig {
     @Bean
     fun jwtAuthenticationConverter(): Converter<Jwt, Mono<JwtAuthenticationToken>> {
         return JwtToAuthenticationConverter()
-    }
-
-    @Bean
-    @Order(-1)
-    fun identityInjectionFilter(): GlobalFilter {
-        return GlobalFilter { exchange, chain ->
-            exchange.getPrincipal<JwtAuthenticationToken>()
-                .flatMap { authentication ->
-                    val jwt = authentication.token
-                    val userId = jwt.claims["sub"] as String // "sub" 클레임을 userId로 사용
-
-                    val roles = authentication.authorities
-                        .map { it.authority }
-                        .joinToString(",")
-
-                    // 클라이언트에서 X-Timezone을 보낸 경우 사용, 없으면 기본값 (UTC)
-                    val timezone = exchange.request.headers["X-Timezone"]?.firstOrNull() ?: "UTC"
-
-                    val modifiedRequest = exchange.request.mutate()
-                        .header("X-User-Id", userId)
-                        .header("X-User-Roles", roles)
-                        .header("X-Timezone", timezone)
-                        .build()
-
-                    val modifiedExchange = exchange.mutate().request(modifiedRequest).build()
-                    chain.filter(modifiedExchange)
-                }
-                .switchIfEmpty(
-                    chain.filter(exchange)
-                )
-        }
     }
 }

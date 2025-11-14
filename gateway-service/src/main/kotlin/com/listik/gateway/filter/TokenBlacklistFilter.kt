@@ -1,5 +1,6 @@
 package com.listik.gateway.filter
 
+import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.Authentication
@@ -16,8 +17,11 @@ import reactor.core.publisher.Mono
  *
  * 로그아웃 한 토큰이 블랙리스트에 등록되어 있는지 확인합니다.
  * 블랙리스트에 있는 토큰은 요청을 거부합니다.
+ *
+ * Order -100으로 설정하여 SecurityWebFilterChain보다 먼저 실행됩니다.
  */
 @Component
+@Order(-100)
 class TokenBlacklistFilter(
     private val redisTemplate: RedisTemplate<String, String>
 ) : WebFilter {
