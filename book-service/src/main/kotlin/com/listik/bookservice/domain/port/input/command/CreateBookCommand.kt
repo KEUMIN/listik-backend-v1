@@ -4,7 +4,7 @@ import com.listik.bookservice.domain.eunum.BookRecordStatus
 import java.time.Instant
 
 data class CreateBookCommand(
-    val userId: Long,
+    val userId: String,
     val title: String,
     val author: String?,
     val coverUrl: String?,

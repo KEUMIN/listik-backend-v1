@@ -9,13 +9,13 @@ import org.springframework.data.repository.CrudRepository
 interface BookRecordJpaRepository :
     CrudRepository<BookRecordEntity, Long> {
     fun findAllByUserIdAndStatus(
-        userId: Long,
+        userId: String,
         status: BookRecordStatus,
         pageable: Pageable
     ): Slice<BookRecordEntity>
 
     fun findAllByUserIdAndStatusAndTitleContaining(
-        userId: Long,
+        userId: String,
         status: BookRecordStatus,
         title: String,
         pageable: Pageable

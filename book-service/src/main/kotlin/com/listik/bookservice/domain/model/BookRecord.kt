@@ -5,7 +5,7 @@ import java.time.Instant
 
 class BookRecord(
     val id: Long? = null,
-    val userId: Long,
+    val userId: String,
     var title: String,
     var author: String?,
     var coverUrl: String?,

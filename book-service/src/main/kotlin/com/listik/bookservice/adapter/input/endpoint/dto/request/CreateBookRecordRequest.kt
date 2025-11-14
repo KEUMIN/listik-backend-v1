@@ -6,7 +6,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 data class CreateBookRecordRequest(
-    val userId: Long,
     val title: String,
     val author: String?,
     val coverUrl: String?,
@@ -19,7 +18,7 @@ data class CreateBookRecordRequest(
     val totalPageNumber: Int,
     val currentPageNumber: Int = 0,
 ) {
-    fun toCommand(zoneId: String) = CreateBookCommand(
+    fun toCommand(userId: String, zoneId: String) = CreateBookCommand(
         userId = userId,
         title = title,
         author = author,

@@ -15,7 +15,7 @@ class BookRecordEntity(
     var id: Long? = null,
 
     @Column(nullable = false)
-    var userId: Long,
+    var userId: String,
 
     @Column(nullable = false)
     var title: String,
