@@ -12,4 +12,5 @@ interface BookRecordUseCase {
     fun create(command: CreateBookCommand): BookRecord
     fun update(id: Long, command: UpdateBookCommand): BookRecord
     fun delete(id: Long)
+    fun deleteByUserId(userId: String)
 }

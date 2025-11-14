@@ -43,7 +43,7 @@ class SecurityConfig(
                 auth
                     .requestMatchers("/users/auth-account/**", "/users/create-with-auth")
                     .hasRole(Role.SERVICE.name)
-                    .requestMatchers("/users/update").hasRole("USER")
+                    .requestMatchers("/users/**").hasRole("USER")
                     .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**")
                     .permitAll()
                     .anyRequest().denyAll()

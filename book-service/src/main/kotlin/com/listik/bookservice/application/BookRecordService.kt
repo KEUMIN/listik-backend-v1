@@ -59,4 +59,8 @@ class BookRecordService(
     override fun delete(id: Long) {
         repository.deleteById(id)
     }
+
+    override fun deleteByUserId(userId: String) {
+        repository.deleteByUserId(userId)
+    }
 }

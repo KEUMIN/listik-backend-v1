@@ -108,4 +108,13 @@ class BookRecordController(
             .status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success(Unit))
     }
+
+    @Operation(summary = "사용자 책 레코드 전체 삭제", description = "사용자의 모든 책 레코드를 삭제합니다. (회원 탈퇴 시 호출)")
+    @DeleteMapping("/book-records/user/{userId}")
+    fun deleteUserBookRecords(@PathVariable userId: String): ResponseEntity<ApiResponse<Unit>> {
+        service.deleteByUserId(userId)
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .body(ApiResponse.success(Unit))
+    }
 }

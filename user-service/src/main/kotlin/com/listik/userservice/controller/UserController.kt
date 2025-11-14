@@ -9,7 +9,7 @@ import com.listik.userservice.dto.response.UserResponse
 import com.listik.userservice.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/users")
@@ -53,7 +53,7 @@ class UserController(
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
-    @PutMapping("/update")
+    @PutMapping
     fun update(
         @RequestHeader(HEADER_USER_ID_KEY) userId: String,
         @RequestBody request: UpdateUserRequest
@@ -61,5 +61,14 @@ class UserController(
         val userUUID = UUID.fromString(userId)
         val updatedUser = userService.update(userUUID, request.nickName)
         return ResponseEntity.ok(ApiResponse.success(UserResponse.from(updatedUser)))
+    }
+
+    @DeleteMapping
+    fun delete(
+        @RequestHeader(HEADER_USER_ID_KEY) userId: String
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val userUUID = UUID.fromString(userId)
+        userService.delete(userUUID)
+        return ResponseEntity.ok(ApiResponse.success(Unit))
     }
 }

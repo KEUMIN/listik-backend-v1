@@ -9,4 +9,5 @@ interface BookRecordRepositoryPort {
     fun findAllByQuery(query: GetBookRecordsQuery): Slice<BookRecord>
     fun save(record: BookRecord): BookRecord
     fun deleteById(id: Long)
+    fun deleteByUserId(userId: String)
 }

@@ -20,4 +20,6 @@ interface BookRecordJpaRepository :
         title: String,
         pageable: Pageable
     ): Slice<BookRecordEntity>
+
+    fun deleteByUserId(userId: String)
 }

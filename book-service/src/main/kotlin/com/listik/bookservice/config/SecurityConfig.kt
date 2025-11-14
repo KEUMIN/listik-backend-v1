@@ -18,15 +18,27 @@ class SecurityConfig {
     }
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    fun filterChain(
+        http: HttpSecurity,
+        serviceAuthenticationFilter: ServiceAuthenticationFilter
+    ): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .addFilterBefore(gatewayAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(
+                serviceAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter::class.java
+            )
+            .addFilterBefore(
+                gatewayAuthenticationFilter(),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
             .authorizeHttpRequests { auth ->
                 auth
+                    .requestMatchers("/books/book-records/user/**").hasRole("SERVICE")
                     .requestMatchers("/books/**").hasRole("USER")
-                    .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**")
+                    .permitAll()
                     .anyRequest().denyAll()
             }
 
