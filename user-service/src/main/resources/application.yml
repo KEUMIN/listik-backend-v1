@@ -68,3 +68,7 @@ feign:
       default:
         connect-timeout: 5000
         read-timeout: 10000
+
+services:
+  book-service:
+    url: ${BOOK_SERVICE_URL}

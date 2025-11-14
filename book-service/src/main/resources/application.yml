@@ -35,6 +35,10 @@ server:
 jwt:
   secret: ${JWT_SECRET}
 
+service:
+  auth:
+    secret: ${SERVICE_AUTH_SECRET}
+
 management:
   endpoints:
     web:
