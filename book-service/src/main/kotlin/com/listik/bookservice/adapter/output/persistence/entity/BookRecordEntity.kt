@@ -43,7 +43,7 @@ class BookRecordEntity(
     @Column(nullable = false)
     var currentPageNumber: Int,
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     var review: String? = null
 ) : BaseEntity() {
     fun toDomain(): BookRecord =
