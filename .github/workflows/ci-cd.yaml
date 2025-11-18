@@ -17,6 +17,7 @@ jobs:
   build-push-bump:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         include:
           - name: auth-service
@@ -89,6 +90,13 @@ jobs:
           tags: |
             ${{ steps.vars.outputs.registry }}/${{ matrix.name }}:${{ steps.vars.outputs.short_sha }}
             ${{ steps.vars.outputs.registry }}/${{ matrix.name }}:latest
+
+      - name: Sync with remote main
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
 
       - name: Update kustomization.yaml
         if: steps.changed.outputs.changed == 'true'
