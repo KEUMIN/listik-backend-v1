@@ -1,6 +1,5 @@
 package com.listik.userservice.config
 
-import com.listik.userservice.entity.Role
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -9,12 +8,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 
-class ServiceAuthenticationFilter(
-    private val serviceAuthSecret: String
-) : OncePerRequestFilter() {
+class GatewayAuthenticationFilter : OncePerRequestFilter() {
 
     companion object {
-        private const val SERVICE_AUTH_HEADER = "X-Service-Auth"
+        private const val USER_ID_HEADER = "X-User-Id"
+        private const val USER_ROLES_HEADER = "X-User-Roles"
     }
 
     override fun doFilterInternal(
@@ -22,17 +20,23 @@ class ServiceAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val serviceAuthHeader = request.getHeader(SERVICE_AUTH_HEADER)
-        
-        if (serviceAuthHeader == serviceAuthSecret) {
+        val userId = request.getHeader(USER_ID_HEADER)
+        val rolesHeader = request.getHeader(USER_ROLES_HEADER)
+
+        if (userId != null && rolesHeader != null) {
+
+            val authorities = rolesHeader.split(",")
+                .map { SimpleGrantedAuthority(it) }
+
             val authentication = UsernamePasswordAuthenticationToken(
-                "internal-service",
+                userId,
                 null,
-                listOf(SimpleGrantedAuthority("ROLE_${Role.SERVICE.name}"))
+                authorities
             )
+
             SecurityContextHolder.getContext().authentication = authentication
         }
-        
+
         filterChain.doFilter(request, response)
     }
 }

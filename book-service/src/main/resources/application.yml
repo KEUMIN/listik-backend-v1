@@ -35,6 +35,10 @@ server:
 jwt:
   secret: ${JWT_SECRET}
 
+service:
+  auth:
+    secret: ${SERVICE_AUTH_SECRET}
+
 management:
   endpoints:
     web:
@@ -46,11 +50,11 @@ management:
 
 logging:
   level:
-    com.listik.bookservice: DEBUG
-    org.springframework.data.jpa: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: DEBUG
+    com.listik.bookservice: ERROR
+    org.springframework.data.jpa: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.springframework.security: ERROR
 
 springdoc:
   api-docs:

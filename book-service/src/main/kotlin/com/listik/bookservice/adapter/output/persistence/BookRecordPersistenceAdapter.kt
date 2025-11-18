@@ -41,4 +41,8 @@ class BookRecordPersistenceAdapter(
     override fun deleteById(id: Long) {
         jpaRepository.deleteById(id)
     }
+
+    override fun deleteByUserId(userId: String) {
+        jpaRepository.deleteByUserId(userId)
+    }
 }

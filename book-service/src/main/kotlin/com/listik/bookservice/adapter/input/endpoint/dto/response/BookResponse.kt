@@ -6,7 +6,6 @@ import java.time.Instant
 
 data class BookResponse(
     val id: Long,
-    val userId: Long,
     val title: String,
     val author: String?,
     val coverUrl: String?,
@@ -23,7 +22,6 @@ data class BookResponse(
         fun from(book: BookRecord): BookResponse =
             BookResponse(
                 id = book.id ?: throw IllegalStateException("Book ID must not be null"),
-                userId = book.userId,
                 title = book.title,
                 author = book.author,
                 coverUrl = book.coverUrl,

@@ -56,9 +56,9 @@ management:
 
 logging:
   level:
-    com.listik.gateway: DEBUG
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.web.reactive: DEBUG
+    com.listik.gateway: ERROR
+    org.springframework.cloud.gateway: ERROR
+    org.springframework.web.reactive: ERROR
 
 resilience4j:
   circuitbreaker:

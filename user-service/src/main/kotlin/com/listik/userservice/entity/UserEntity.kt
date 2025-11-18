@@ -1,9 +1,8 @@
 package com.listik.userservice.entity
 
+import com.listik.coreservice.entity.BaseEntity
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 /**
  * 최소한의 사용자 메타데이터만 보관
@@ -17,10 +16,6 @@ class UserEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
 
-    @Column(nullable = false)
-    var tokenVersion: Int = 0,  // 강제 로그아웃을 위한 버전
+    var nickName: String? = null,
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    var createdAt: Instant? = null
-)
+    ) : BaseEntity()

@@ -1,10 +1,11 @@
 package com.listik.bookservice.adapter.input.endpoint
 
 import com.listik.bookservice.adapter.input.endpoint.dto.request.CreateBookRecordRequest
-import com.listik.bookservice.adapter.input.endpoint.dto.request.GetBookRecordsRequest
 import com.listik.bookservice.adapter.input.endpoint.dto.request.UpdateBookRequest
 import com.listik.bookservice.adapter.input.endpoint.dto.response.BookResponse
+import com.listik.bookservice.domain.eunum.BookRecordStatus
 import com.listik.bookservice.domain.port.input.BookRecordUseCase
+import com.listik.bookservice.domain.port.input.query.GetBookRecordsQuery
 import com.listik.coreservice.dto.ApiResponse
 import com.listik.coreservice.dto.SliceResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -22,6 +23,7 @@ class BookRecordController(
     private val service: BookRecordUseCase
 ) {
     companion object {
+        private const val HEADER_USER_ID_KEY = "X-User-Id"
         private const val HEADER_TIMEZONE_KEY = "X-Timezone"
     }
 
@@ -36,9 +38,21 @@ class BookRecordController(
     @Operation(summary = "상태별 책 목록 조회 (스크롤 페이징)", description = "유저 ID와 상태에 따라 책 목록을 페이징 조회합니다.")
     @GetMapping("/book-records")
     fun getAllByQuery(
-        @RequestBody request: GetBookRecordsRequest
+        @RequestHeader(HEADER_USER_ID_KEY) userId: String,
+        @RequestParam status: BookRecordStatus,
+        @RequestParam title: String?,
+        @RequestParam page: Int,
+        @RequestParam size: Int,
     ): ResponseEntity<ApiResponse<SliceResponse<BookResponse>>> {
-        val slice = service.getAllByQuery(request.toQuery())
+        val slice = service.getAllByQuery(
+            query = GetBookRecordsQuery(
+                userId = userId,
+                status = status,
+                title = title,
+                page = page,
+                size = size,
+            )
+        )
         val dtoSlice = SliceResponse(
             content = slice.content.map(BookResponse::from),
             hasNext = slice.hasNext()
@@ -49,10 +63,16 @@ class BookRecordController(
     @Operation(summary = "책 생성", description = "새 책을 등록합니다.")
     @PostMapping("/book-records")
     fun create(
+        @RequestHeader(HEADER_USER_ID_KEY) userId: String,
         @RequestHeader(HEADER_TIMEZONE_KEY) zoneId: String,
         @RequestBody request: CreateBookRecordRequest,
     ): ResponseEntity<ApiResponse<BookResponse>> {
-        val created = service.create(request.toCommand(zoneId))
+        val created = service.create(
+            request.toCommand(
+                userId = userId,
+                zoneId = zoneId,
+            )
+        )
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(
@@ -84,6 +104,15 @@ class BookRecordController(
     @DeleteMapping("/book-records/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<ApiResponse<Unit>> {
         service.delete(id)
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .body(ApiResponse.success(Unit))
+    }
+
+    @Operation(summary = "사용자 책 레코드 전체 삭제", description = "사용자의 모든 책 레코드를 삭제합니다. (회원 탈퇴 시 호출)")
+    @DeleteMapping("/book-records/user/{userId}")
+    fun deleteUserBookRecords(@PathVariable userId: String): ResponseEntity<ApiResponse<Unit>> {
+        service.deleteByUserId(userId)
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success(Unit))

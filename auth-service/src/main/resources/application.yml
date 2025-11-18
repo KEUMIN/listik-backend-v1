@@ -47,8 +47,7 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${GOOGLE_IOS_CLIENT_ID},${GOOGLE_WEB_CLIENT_ID}
           apple:
             client-id: ${APPLE_CLIENT_ID}
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
@@ -61,7 +60,13 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000
+  expiration: 86400000  # 24시간 (밀리초)
+  refresh-expiration: 604800000  # 7일 (밀리초)
+
+apple:
+  team-id: ${APPLE_TEAM_ID:}
+  key-id: ${APPLE_KEY_ID:}
+  private-key-path: ${APPLE_PRIVATE_KEY_PATH:classpath:apple-private-key.p8}
 
 service:
   auth:
@@ -89,9 +94,15 @@ management:
 
 logging:
   level:
-    com.listik.authservice: DEBUG
-    org.springframework.security: DEBUG
-    feign: DEBUG
+    com.listik.authservice: ERROR
+    org.springframework.security: ERROR
+    org.springframework.security.web: ERROR
+    org.springframework.security.oauth2: ERROR
+    org.springframework.web: ERROR
+    org.springframework.web.servlet: ERROR
+    feign: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
 
 springdoc:
   api-docs:
