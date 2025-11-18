@@ -94,15 +94,15 @@ management:
 
 logging:
   level:
-    com.listik.authservice: DEBUG
-    org.springframework.security: TRACE
-    org.springframework.security.web: TRACE
-    org.springframework.security.oauth2: TRACE
-    org.springframework.web: DEBUG
-    org.springframework.web.servlet: DEBUG
-    feign: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.listik.authservice: ERROR
+    org.springframework.security: ERROR
+    org.springframework.security.web: ERROR
+    org.springframework.security.oauth2: ERROR
+    org.springframework.web: ERROR
+    org.springframework.web.servlet: ERROR
+    feign: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
 
 springdoc:
   api-docs:
