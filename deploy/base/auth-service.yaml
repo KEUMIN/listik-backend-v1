@@ -32,11 +32,16 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: AUTH_SERVICE_URL
-            - name: GOOGLE_CLIENT_ID
+            - name: GOOGLE_IOS_CLIENT_ID
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: GOOGLE_CLIENT_ID
+                  key: GOOGLE_IOS_CLIENT_ID
+            - name: GOOGLE_WEB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: GOOGLE_WEB_CLIENT_ID
             - name: GOOGLE_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:

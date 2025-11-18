@@ -52,6 +52,11 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: JWT_SECRET
+            - name: SERVICE_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SERVICE_AUTH_SECRET
           resources:
             requests:
               cpu: "200m"
