@@ -62,6 +62,16 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: USER_SERVICE_URL
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REDIS_PORT
           resources:
             requests:
               cpu: "200m"
