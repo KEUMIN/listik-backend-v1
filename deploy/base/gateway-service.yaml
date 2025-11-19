@@ -18,7 +18,7 @@ spec:
       containers:
         - name: gateway-service
           image: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/gateway-service:v1
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
