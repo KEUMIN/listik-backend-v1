@@ -47,16 +47,11 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: JWT_SECRET
-            - name: REDIS_HOST
+            - name: REDIS_URL
               valueFrom:
                 configMapKeyRef:
                   name: app-config
-                  key: REDIS_HOST
-            - name: REDIS_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: REDIS_PORT
+                  key: REDIS_URL
           resources:
             requests:
               cpu: "200m"
