@@ -17,6 +17,7 @@ spring:
           max-active: 8
           max-idle: 8
           min-idle: 0
+      url: rediss://master.listik-prod-ec-cluster-01.jcey0c.apn2.cache.amazonaws.com:6379
 
   cloud:
     gateway:
@@ -71,6 +72,8 @@ logging:
     com.listik.gateway: ERROR
     org.springframework.cloud.gateway: ERROR
     org.springframework.web.reactive: ERROR
+    io.lettuce.core: DEBUG
+    org.springframework.data.redis: DEBUG
 
 resilience4j:
   circuitbreaker:

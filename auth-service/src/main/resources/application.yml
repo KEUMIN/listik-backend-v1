@@ -105,6 +105,8 @@ logging:
     feign: ERROR
     org.hibernate.SQL: ERROR
     org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    io.lettuce.core: DEBUG
+    org.springframework.data.redis: DEBUG
 
 springdoc:
   api-docs:
