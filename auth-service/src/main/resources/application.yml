@@ -9,11 +9,11 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      url: ${REDIS_URL}
       ssl:
         enabled: true
-      timeout: 2000ms
+      connect-timeout: 5s
+      timeout: 5s
       lettuce:
         pool:
           max-active: 8
