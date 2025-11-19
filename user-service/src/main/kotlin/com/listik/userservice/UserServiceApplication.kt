@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 @EnableFeignClients
 class UserServiceApplication
 
+// Confirmation commit to trigger deployment : 2025-11-19 22:11
 fun main(args: Array<String>) {
     runApplication<UserServiceApplication>(*args)
 }
