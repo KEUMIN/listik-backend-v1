@@ -71,8 +71,6 @@ logging:
     com.listik.gateway: ERROR
     org.springframework.cloud.gateway: ERROR
     org.springframework.web.reactive: ERROR
-    io.lettuce.core: DEBUG
-    org.springframework.data.redis: DEBUG
 
 resilience4j:
   circuitbreaker:
