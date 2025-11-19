@@ -12,7 +12,7 @@ images:
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/auth-service
     newTag: 1e173c7eb7e4
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/user-service
-    newTag: a7aab7c31d55
+    newTag: c2ae7a1d1578
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/book-service
     newTag: e2f88967620c
   - name: 590183877725.dkr.ecr.ap-northeast-2.amazonaws.com/gateway-service
