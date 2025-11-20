@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 @EnableFeignClients
 class AuthServiceApplication
 
+// Confirmation commit to trigger deployment : 2025-11-20 10:05
 fun main(args: Array<String>) {
     runApplication<AuthServiceApplication>(*args)
 }
