@@ -7,6 +7,7 @@ import com.listik.authservice.service.AuthService
 import com.listik.coreservice.dto.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -72,5 +73,25 @@ class AuthController(
         val accessToken = authorizationHeader.removePrefix("Bearer ").trim()
         authService.logout(accessToken)
         return ResponseEntity.ok(ApiResponse.success(Unit))
+    }
+
+    @GetMapping("/apple/callback")
+    fun appleWebOAuthCallback(
+        @RequestParam(required = false) code: String,
+        @RequestParam(required = false) state: String,
+        @RequestParam(required = false) error: String,
+        response: HttpServletResponse,
+    ) {
+        if (error != null) {
+            response.sendRedirect("com.listik.booktracker://apple-callback?error=$error")
+            return
+        }
+
+        if (code == null) {
+            response.sendRedirect("com.listik.booktracker://apple-callback?error=no_code")
+            return
+        }
+
+        response.sendRedirect("com.listik.booktracker://apple-callback?code=$code&state=$state")
     }
 }

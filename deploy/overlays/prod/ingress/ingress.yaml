@@ -7,8 +7,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-    - host: listik-prod-alb-1413593998.ap-northeast-2.elb.amazonaws.com
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix

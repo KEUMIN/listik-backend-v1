@@ -13,8 +13,8 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.web.server.SecurityWebFilterChain
 import reactor.core.publisher.Mono
-import javax.crypto.spec.SecretKeySpec
 import java.nio.charset.StandardCharsets
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * JWT에서 roles 클레임을 authorities로 변환하는 컨버터
@@ -39,6 +39,7 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeExchange { exchanges ->
                 exchanges
+                    .pathMatchers("/api/v1/auth/apple/callback").permitAll()
                     .pathMatchers("/api/v1/auth/verify").permitAll()
                     .pathMatchers("/api/v1/auth/refresh").permitAll()
                     .pathMatchers("/api/v1/auth/logout").authenticated()
