@@ -77,9 +77,9 @@ class AuthController(
 
     @GetMapping("/apple/callback")
     fun appleWebOAuthCallback(
-        @RequestParam(required = false) code: String,
-        @RequestParam(required = false) state: String,
-        @RequestParam(required = false) error: String,
+        @RequestParam(required = false) code: String?,
+        @RequestParam(required = false) state: String?,
+        @RequestParam(required = false) error: String?,
         response: HttpServletResponse,
     ) {
         if (error != null) {
