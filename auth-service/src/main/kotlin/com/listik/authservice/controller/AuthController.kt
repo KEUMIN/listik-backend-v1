@@ -80,8 +80,25 @@ class AuthController(
         @RequestParam(required = false) code: String?,
         @RequestParam(required = false) state: String?,
         @RequestParam(required = false) error: String?,
+        @RequestParam("id_token", required = false) idToken: String?, // sign_in_with_apple이 사용
         response: HttpServletResponse,
     ) {
+        if (idToken != null) {
+            response.contentType = "text/html"
+            response.writer.write(
+                """
+            <html>
+            <body>
+                <h1>로그인 성공!</h1>
+                <p>이 창을 닫아주세요.</p>
+                <script>window.close();</script>
+            </body>
+            </html>
+        """.trimIndent()
+            )
+            return
+        }
+
         if (error != null) {
             response.sendRedirect("com.listik.booktracker://apple-callback?error=$error")
             return
@@ -92,6 +109,7 @@ class AuthController(
             return
         }
 
+        // 기존 로직: code를 앱으로 전달
         response.sendRedirect("com.listik.booktracker://apple-callback?code=$code&state=$state")
     }
 }
