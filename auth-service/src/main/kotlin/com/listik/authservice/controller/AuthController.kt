@@ -87,20 +87,38 @@ class AuthController(
     ) {
         log.info("Apple callback received - code: ${code != null}, error: $error, idToken: ${idToken != null}")
 
+        // UTF-8 charset 설정
+        response.characterEncoding = "UTF-8"
+
         // 에러 처리
         if (error != null) {
             log.error("Apple auth error: $error")
-            response.contentType = "text/html"
+            response.contentType = "text/html;charset=UTF-8"
             response.writer.write(
                 """
+            <!DOCTYPE html>
             <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Apple Sign In</title>
+            </head>
             <body>
-                <h1>로그인 실패</h1>
-                <p>에러: $error</p>
-                <p>이 창을 닫아주세요.</p>
+                <h1>Login Failed</h1>
+                <p>Error: $error</p>
                 <script>
-                    setTimeout(function() { window.close(); }, 3000);
+                    // Flutter 앱으로 에러 Deep Link 리다이렉트
+                    const error = '$error';
+
+                    console.log('Apple OAuth Error:', error);
+
+                    // Flutter 앱으로 Deep Link 리다이렉트
+                    // listik://apple-signin?error=...
+                    const deepLinkUrl = 'com.listik.booktracker://apple-callback??error=' + encodeURIComponent(error);
+                    console.log('Redirecting to:', deepLinkUrl);
+
+                    window.location.href = deepLinkUrl;
                 </script>
+                <p>Redirecting to app...</p>
             </body>
             </html>
         """.trimIndent()
@@ -108,29 +126,37 @@ class AuthController(
             return
         }
 
-        // code가 있으면 그대로 HTML로 반환 (sign_in_with_apple이 파싱)
+        // code가 있으면 Flutter 앱으로 Deep Link로 리다이렉트
         if (code != null) {
-            log.info("Returning code to client")
-            response.contentType = "text/html"
+            log.info("Returning code to client with state: $state")
+            response.contentType = "text/html;charset=UTF-8"
             response.writer.write(
                 """
             <!DOCTYPE html>
             <html>
-            <head><title>Sign in with Apple</title></head>
+            <head>
+                <meta charset="UTF-8">
+                <title>Apple Sign In</title>
+            </head>
             <body>
+                <h1>Processing...</h1>
                 <script>
-                    // sign_in_with_apple 패키지가 이 정보를 파싱합니다
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const code = urlParams.get('code');
-                    const state = urlParams.get('state');
-                    
-                    // 디버깅용
+                    // Flutter 앱의 Deep Link URL Scheme으로 리다이렉트
+                    const code = '$code';
+                    const state = '$state';
+
+                    console.log('Apple OAuth Code received');
                     console.log('Code:', code);
                     console.log('State:', state);
-                    
-                    // 자동으로 닫힘 (sign_in_with_apple이 감지)
+
+                    // Flutter 앱으로 Deep Link 리다이렉트
+                    // listik://apple-signin?code=...&state=...
+                    const deepLinkUrl = 'com.listik.booktracker://apple-callback?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state);
+                    console.log('Redirecting to:', deepLinkUrl);
+
+                    window.location.href = deepLinkUrl;
                 </script>
-                <p>로그인 처리 중...</p>
+                <p>Redirecting to app...</p>
             </body>
             </html>
         """.trimIndent()
@@ -140,13 +166,19 @@ class AuthController(
 
         // code도 없고 error도 없으면
         log.warn("No code or error in Apple callback")
-        response.contentType = "text/html"
+        response.contentType = "text/html;charset=UTF-8"
         response.writer.write(
             """
+        <!DOCTYPE html>
         <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Apple Sign In</title>
+        </head>
         <body>
-            <h1>알 수 없는 응답</h1>
-            <p>이 창을 닫아주세요.</p>
+            <h1>Unknown Response</h1>
+            <p>No authorization code received.</p>
+            <p>Please close this window.</p>
         </body>
         </html>
     """.trimIndent()
