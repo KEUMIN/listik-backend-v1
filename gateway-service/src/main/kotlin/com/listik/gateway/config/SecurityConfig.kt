@@ -39,7 +39,6 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeExchange { exchanges ->
                 exchanges
-                    .pathMatchers("/api/v1/auth/apple/callback").permitAll()
                     .pathMatchers("/api/v1/auth/verify").permitAll()
                     .pathMatchers("/api/v1/auth/refresh").permitAll()
                     .pathMatchers("/api/v1/auth/logout").authenticated()
