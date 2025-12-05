@@ -7,8 +7,6 @@ import com.listik.authservice.service.AuthService
 import com.listik.coreservice.dto.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletResponse
-import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.*
 class AuthController(
     private val authService: AuthService
 ) {
-    private val log = LoggerFactory.getLogger(AuthController::class.java)
-
     @Operation(
         summary = "ID Token 검증 및 백엔드 토큰 발급",
         description = """
@@ -75,113 +71,5 @@ class AuthController(
         val accessToken = authorizationHeader.removePrefix("Bearer ").trim()
         authService.logout(accessToken)
         return ResponseEntity.ok(ApiResponse.success(Unit))
-    }
-
-    @GetMapping("/apple/callback")
-    fun appleWebOAuthCallback(
-        @RequestParam(required = false) code: String?,
-        @RequestParam(required = false) state: String?,
-        @RequestParam(required = false) error: String?,
-        @RequestParam("id_token", required = false) idToken: String?,
-        response: HttpServletResponse,
-    ) {
-        log.info("Apple callback received - code: ${code != null}, error: $error, idToken: ${idToken != null}")
-
-        // UTF-8 charset 설정
-        response.characterEncoding = "UTF-8"
-
-        // 에러 처리
-        if (error != null) {
-            log.error("Apple auth error: $error")
-            response.contentType = "text/html;charset=UTF-8"
-            response.writer.write(
-                """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Apple Sign In</title>
-            </head>
-            <body>
-                <h1>Login Failed</h1>
-                <p>Error: $error</p>
-                <script>
-                    // Flutter 앱으로 에러 Deep Link 리다이렉트
-                    const error = '$error';
-
-                    console.log('Apple OAuth Error:', error);
-
-                    // Flutter 앱으로 Deep Link 리다이렉트
-                    // listik://apple-signin?error=...
-                    const deepLinkUrl = 'com.listik.booktracker://apple-callback??error=' + encodeURIComponent(error);
-                    console.log('Redirecting to:', deepLinkUrl);
-
-                    window.location.href = deepLinkUrl;
-                </script>
-                <p>Redirecting to app...</p>
-            </body>
-            </html>
-        """.trimIndent()
-            )
-            return
-        }
-
-        // code가 있으면 Flutter 앱으로 Deep Link로 리다이렉트
-        if (code != null) {
-            log.info("Returning code to client with state: $state")
-            response.contentType = "text/html;charset=UTF-8"
-            response.writer.write(
-                """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Apple Sign In</title>
-            </head>
-            <body>
-                <h1>Processing...</h1>
-                <script>
-                    // Flutter 앱의 Deep Link URL Scheme으로 리다이렉트
-                    const code = '$code';
-                    const state = '$state';
-
-                    console.log('Apple OAuth Code received');
-                    console.log('Code:', code);
-                    console.log('State:', state);
-
-                    // Flutter 앱으로 Deep Link 리다이렉트
-                    // listik://apple-signin?code=...&state=...
-                    const deepLinkUrl = 'com.listik.booktracker://apple-callback?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state);
-                    console.log('Redirecting to:', deepLinkUrl);
-
-                    window.location.href = deepLinkUrl;
-                </script>
-                <p>Redirecting to app...</p>
-            </body>
-            </html>
-        """.trimIndent()
-            )
-            return
-        }
-
-        // code도 없고 error도 없으면
-        log.warn("No code or error in Apple callback")
-        response.contentType = "text/html;charset=UTF-8"
-        response.writer.write(
-            """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Apple Sign In</title>
-        </head>
-        <body>
-            <h1>Unknown Response</h1>
-            <p>No authorization code received.</p>
-            <p>Please close this window.</p>
-        </body>
-        </html>
-    """.trimIndent()
-        )
     }
 }
