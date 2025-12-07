@@ -215,8 +215,10 @@ class AuthService(
                 )
             }
 
-            // Refresh Token 삭제 (userId로 조회하여 삭제)
-            refreshTokenRepository.deleteByUserId(UUID.fromString(userId))
+            val userUuid = UUID.fromString(userId)
+            refreshTokenRepository.findByUserId(userUuid)?.let { refreshToken ->
+                refreshTokenRepository.delete(refreshToken)
+            }
 
         } catch (e: Exception) {
             throw IllegalArgumentException("로그아웃 처리 중 오류 발생: ${e.message}", e)
