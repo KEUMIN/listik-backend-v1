@@ -61,6 +61,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom(SpringBootPlugin.BOM_COORDINATES)
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.3")
     }
 }
